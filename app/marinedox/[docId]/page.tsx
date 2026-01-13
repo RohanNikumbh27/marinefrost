@@ -69,7 +69,7 @@ export default function MarineDoxDetailPage() {
             <div className="max-w-5xl mx-auto space-y-6">
                 {/* Top Bar */}
                 <div
-                    className="flex items-center justify-between p-4 rounded-2xl backdrop-blur-md"
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 p-4 rounded-2xl backdrop-blur-md"
                     style={{
                         backgroundColor: 'var(--marinedox-glass-bg)',
                         border: '1px solid var(--marinedox-glass-border)'
@@ -115,7 +115,7 @@ export default function MarineDoxDetailPage() {
                         </div>
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center flex-wrap gap-2">
                         {isEditing ? (
                             <>
                                 <Button

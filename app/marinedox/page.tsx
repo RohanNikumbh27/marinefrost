@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, Plus, Search, Calendar, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'motion/react';
@@ -71,16 +72,17 @@ export default function MarineDoxListPage() {
                                 className="pl-10 rounded-xl"
                             />
                         </div>
-                        <select
-                            value={filterProject}
-                            onChange={(e) => setFilterProject(e.target.value)}
-                            className="px-4 py-2 rounded-xl border bg-background"
-                        >
-                            <option value="all">All Projects</option>
-                            {projects.map(p => (
-                                <option key={p.id} value={p.id}>{p.name}</option>
-                            ))}
-                        </select>
+                        <Select value={filterProject} onValueChange={setFilterProject}>
+                            <SelectTrigger className="w-full md:w-[200px] rounded-xl">
+                                <SelectValue placeholder="All Projects" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl">
+                                <SelectItem value="all">All Projects</SelectItem>
+                                {projects.map(p => (
+                                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
 

@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { LayoutDashboard, Moon, Sun, Bell, User, LogOut, Menu, FileText } from 'lucide-react';
+import { LayoutDashboard, Moon, Sun, Bell, User, LogOut, Menu, FileText, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import NotificationsPanel from '@/components/NotificationsPanel';
 import Logo from '@/components/Logo';
@@ -89,7 +89,7 @@ export default function Layout({ children }: LayoutProps) {
                                     )}
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="right" className="w-full sm:w-[500px] p-0">
+                            <SheetContent side="right" className="w-full sm:w-[500px] p-0 [&>button]:hidden">
                                 <div className="h-full overflow-hidden">
                                     <NotificationsPanel onClose={() => setShowNotifications(false)} />
                                 </div>
@@ -130,25 +130,143 @@ export default function Layout({ children }: LayoutProps) {
                                     <Menu className="h-5 w-5" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                                <nav className="flex flex-col space-y-4 mt-8">
-                                    <Link
-                                        href="/dashboard"
-                                        className="flex items-center space-x-2 text-lg hover:text-primary transition-colors"
-                                        onClick={() => setMobileMenuOpen(false)}
+                            <SheetContent
+                                side="right"
+                                className="w-[300px] sm:w-[350px] p-0 border-l-0 overflow-hidden [&>button]:hidden"
+                            >
+                                {/* Premium Gradient Background */}
+                                <div className="h-full flex flex-col bg-gradient-to-b from-blue-600 via-blue-700 to-indigo-800 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900">
+                                    {/* Header with Logo */}
+                                    <div className="p-6 pb-4">
+                                        <div className="flex items-center justify-between">
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="flex items-center space-x-3"
+                                            >
+                                                <div className="p-2 bg-white/10 backdrop-blur-sm rounded-xl">
+                                                    <Logo className="h-8 w-8" />
+                                                </div>
+                                                <span className="text-xl font-bold text-white">MarineFrost</span>
+                                            </motion.div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => setMobileMenuOpen(false)}
+                                                className="rounded-xl text-white/80 hover:text-white hover:bg-white/10"
+                                            >
+                                                <X className="h-5 w-5" />
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    {/* Navigation Links */}
+                                    <nav className="flex-1 px-4 py-2">
+                                        <div className="space-y-2">
+                                            <motion.div
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ duration: 0.3, delay: 0.1 }}
+                                            >
+                                                <Link
+                                                    href="/dashboard"
+                                                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${pathname === '/dashboard' || pathname?.startsWith('/project')
+                                                        ? 'bg-white/20 text-white shadow-lg'
+                                                        : 'text-white/80 hover:bg-white/10 hover:text-white'
+                                                        }`}
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                >
+                                                    <div className={`p-2 rounded-lg ${pathname === '/dashboard' || pathname?.startsWith('/project')
+                                                        ? 'bg-white/20'
+                                                        : 'bg-white/10'
+                                                        }`}>
+                                                        <LayoutDashboard className="h-5 w-5" />
+                                                    </div>
+                                                    <span className="font-medium">Projects</span>
+                                                </Link>
+                                            </motion.div>
+
+                                            <motion.div
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ duration: 0.3, delay: 0.2 }}
+                                            >
+                                                <Link
+                                                    href="/marinedox"
+                                                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${pathname?.startsWith('/marinedox')
+                                                        ? 'bg-white/20 text-white shadow-lg'
+                                                        : 'text-white/80 hover:bg-white/10 hover:text-white'
+                                                        }`}
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                >
+                                                    <div className={`p-2 rounded-lg ${pathname?.startsWith('/marinedox')
+                                                        ? 'bg-violet-500/30'
+                                                        : 'bg-white/10'
+                                                        }`}>
+                                                        <FileText className="h-5 w-5" />
+                                                    </div>
+                                                    <span className="font-medium">MarineDox</span>
+                                                </Link>
+                                            </motion.div>
+
+                                            <motion.div
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ duration: 0.3, delay: 0.3 }}
+                                            >
+                                                <Link
+                                                    href="/profile"
+                                                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${pathname === '/profile'
+                                                        ? 'bg-white/20 text-white shadow-lg'
+                                                        : 'text-white/80 hover:bg-white/10 hover:text-white'
+                                                        }`}
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                >
+                                                    <div className={`p-2 rounded-lg ${pathname === '/profile'
+                                                        ? 'bg-white/20'
+                                                        : 'bg-white/10'
+                                                        }`}>
+                                                        <User className="h-5 w-5" />
+                                                    </div>
+                                                    <span className="font-medium">Profile</span>
+                                                </Link>
+                                            </motion.div>
+                                        </div>
+                                    </nav>
+
+                                    {/* User Info Section */}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: 0.4 }}
+                                        className="p-4 border-t border-white/10"
                                     >
-                                        <LayoutDashboard className="h-5 w-5" />
-                                        <span>Projects</span>
-                                    </Link>
-                                    <Link
-                                        href="/marinedox"
-                                        className="flex items-center space-x-2 text-lg hover:text-[var(--marinedox-primary)] transition-colors"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                    >
-                                        <FileText className="h-5 w-5" />
-                                        <span>MarineDox</span>
-                                    </Link>
-                                </nav>
+                                        <div className="flex items-center space-x-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm">
+                                            <Avatar className="h-10 w-10 border-2 border-white/20">
+                                                <AvatarImage src={user?.avatar} alt={user?.name} />
+                                                <AvatarFallback className="bg-white/20 text-white">
+                                                    {user?.name?.charAt(0)}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-medium text-white truncate">{user?.name}</p>
+                                                <p className="text-xs text-white/60 truncate">{user?.email}</p>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            className="w-full mt-3 text-white/80 hover:text-white hover:bg-white/10 rounded-xl justify-start"
+                                            onClick={() => {
+                                                handleLogout();
+                                                setMobileMenuOpen(false);
+                                            }}
+                                        >
+                                            <LogOut className="h-4 w-4 mr-2" />
+                                            Logout
+                                        </Button>
+                                    </motion.div>
+                                </div>
                             </SheetContent>
                         </Sheet>
                     </div>

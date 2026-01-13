@@ -84,7 +84,7 @@ export default function SprintView() {
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center flex-wrap gap-2">
             <SprintSelector projectId={projectId!} currentSprintId={sprintId!} />
             <Button
               variant="outline"

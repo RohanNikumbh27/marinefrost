@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import RichTextEditor from '@/components/RichTextEditor';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Save, FileText, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -19,7 +20,7 @@ export default function NewMarineDoxPage() {
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [projectId, setProjectId] = useState<string>('');
+    const [projectId, setProjectId] = useState<string>('none');
     const [isSaving, setIsSaving] = useState(false);
 
     const handleSave = () => {
@@ -37,7 +38,7 @@ export default function NewMarineDoxPage() {
         addMarineDox({
             title,
             content,
-            projectId: projectId || undefined,
+            projectId: projectId === 'none' ? undefined : projectId,
             author: {
                 id: user?.id || '1',
                 name: user?.name || 'Anonymous',
@@ -54,7 +55,7 @@ export default function NewMarineDoxPage() {
             <div className="max-w-5xl mx-auto space-y-6">
                 {/* Top Bar - Confluence Style */}
                 <div
-                    className="flex items-center justify-between p-4 rounded-2xl backdrop-blur-md"
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 p-4 rounded-2xl backdrop-blur-md"
                     style={{
                         backgroundColor: 'var(--marinedox-glass-bg)',
                         border: '1px solid var(--marinedox-glass-border)'
@@ -77,16 +78,17 @@ export default function NewMarineDoxPage() {
                         </div>
                         <div>
                             <p className="text-sm text-muted-foreground">Creating new document</p>
-                            <select
-                                value={projectId}
-                                onChange={(e) => setProjectId(e.target.value)}
-                                className="text-xs bg-transparent border-none outline-none cursor-pointer hover:text-[var(--marinedox-primary)]"
-                            >
-                                <option value="">No Project</option>
-                                {projects.map(p => (
-                                    <option key={p.id} value={p.id}>{p.name}</option>
-                                ))}
-                            </select>
+                            <Select value={projectId} onValueChange={setProjectId}>
+                                <SelectTrigger className="h-auto p-0 border-none bg-transparent text-xs hover:text-[var(--marinedox-primary)] focus:ring-0 [&>svg]:hidden">
+                                    <SelectValue placeholder="No Project" />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl">
+                                    <SelectItem value="none">No Project</SelectItem>
+                                    {projects.map(p => (
+                                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
 

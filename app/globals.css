@@ -91,6 +91,16 @@
   --sidebar-accent-foreground: #fafafa;
   --sidebar-border: #27272a;
   --sidebar-ring: #52525b;
+
+  /* MarineDox Theme - Dark Mode */
+  --marinedox-primary: #A78BFA;
+  --marinedox-primary-light: #C4B5FD;
+  --marinedox-primary-dark: #8B5CF6;
+  --marinedox-secondary: rgba(167, 139, 250, 0.15);
+  --marinedox-glass-bg: rgba(39, 39, 42, 0.8);
+  --marinedox-glass-border: rgba(167, 139, 250, 0.3);
+  --marinedox-glass-blur: 12px;
+  --marinedox-tertiary: #27272a;
 }
 
 @theme inline {

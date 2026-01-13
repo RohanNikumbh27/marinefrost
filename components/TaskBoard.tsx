@@ -37,7 +37,7 @@ function Column({ status, title, color, tasks, onTaskMove, onTaskClick }: Column
   }));
 
   return (
-    <div className="flex-1 min-w-[280px]">
+    <div className="flex-1 min-w-[260px] sm:min-w-[280px]">
       <div className="bg-muted/50 rounded-2xl p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
@@ -51,12 +51,11 @@ function Column({ status, title, color, tasks, onTaskMove, onTaskClick }: Column
             </span>
           </div>
         </div>
-        <ScrollArea className="h-[calc(100vh-400px)]">
+        <ScrollArea className="h-[calc(100vh-450px)] sm:h-[calc(100vh-400px)]">
           <div
             ref={drop}
-            className={`space-y-3 min-h-[200px] p-2 rounded-xl transition-colors ${
-              isOver ? 'bg-blue-50 dark:bg-blue-950/20' : ''
-            }`}
+            className={`space-y-3 min-h-[200px] p-2 rounded-xl transition-colors ${isOver ? 'bg-blue-50 dark:bg-blue-950/20' : ''
+              }`}
           >
             {tasks.map((task) => (
               <TaskCard

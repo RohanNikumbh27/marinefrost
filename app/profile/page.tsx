@@ -101,7 +101,7 @@ export default function UserProfile() {
                       )}
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
                     <div className="text-center p-3 bg-muted rounded-xl">
                       <div className="text-2xl font-semibold">{userTasks.length}</div>
                       <div className="text-xs text-muted-foreground">Total Tasks</div>
@@ -302,12 +302,12 @@ export default function UserProfile() {
                   {userTasks.slice(0, 6).map((task) => (
                     <div key={task.id} className="flex items-start space-x-4 p-3 rounded-xl hover:bg-muted transition-colors">
                       <div className={`p-2 rounded-lg ${task.status === 'Done' ? 'bg-green-100 dark:bg-green-900/20' :
-                          task.status === 'In Progress' ? 'bg-blue-100 dark:bg-blue-900/20' :
-                            'bg-gray-100 dark:bg-gray-800'
+                        task.status === 'In Progress' ? 'bg-blue-100 dark:bg-blue-900/20' :
+                          'bg-gray-100 dark:bg-gray-800'
                         }`}>
                         <CheckCircle className={`h-4 w-4 ${task.status === 'Done' ? 'text-green-600' :
-                            task.status === 'In Progress' ? 'text-blue-600' :
-                              'text-gray-600'
+                          task.status === 'In Progress' ? 'text-blue-600' :
+                            'text-gray-600'
                           }`} />
                       </div>
                       <div className="flex-1 min-w-0">
