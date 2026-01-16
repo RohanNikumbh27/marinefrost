@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { LayoutDashboard, Moon, Sun, Bell, User, LogOut, Menu, FileText, X } from 'lucide-react';
+import { LayoutDashboard, Moon, Sun, Bell, User, LogOut, Menu, FileText, X, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import NotificationsPanel from '@/components/NotificationsPanel';
 import Logo from '@/components/Logo';
@@ -64,6 +64,15 @@ export default function Layout({ children }: LayoutProps) {
                             <div className="flex items-center space-x-2">
                                 <FileText className="h-4 w-4" />
                                 <span>MarineDox</span>
+                            </div>
+                        </Link>
+                        <Link
+                            href="/chat"
+                            className={`text-sm transition-colors hover:text-blue-500 ${pathname?.startsWith('/chat') ? 'text-blue-500' : 'text-muted-foreground'}`}
+                        >
+                            <div className="flex items-center space-x-2">
+                                <MessageSquare className="h-4 w-4" />
+                                <span>Chat</span>
                             </div>
                         </Link>
                     </nav>
@@ -213,6 +222,29 @@ export default function Layout({ children }: LayoutProps) {
                                             <motion.div
                                                 initial={{ opacity: 0, x: 20 }}
                                                 animate={{ opacity: 1, x: 0 }}
+                                                transition={{ duration: 0.3, delay: 0.25 }}
+                                            >
+                                                <Link
+                                                    href="/chat"
+                                                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${pathname?.startsWith('/chat')
+                                                        ? 'bg-white/20 text-white shadow-lg'
+                                                        : 'text-white/80 hover:bg-white/10 hover:text-white'
+                                                        }`}
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                >
+                                                    <div className={`p-2 rounded-lg ${pathname?.startsWith('/chat')
+                                                        ? 'bg-blue-500/30'
+                                                        : 'bg-white/10'
+                                                        }`}>
+                                                        <MessageSquare className="h-5 w-5" />
+                                                    </div>
+                                                    <span className="font-medium">Chat</span>
+                                                </Link>
+                                            </motion.div>
+
+                                            <motion.div
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
                                                 transition={{ duration: 0.3, delay: 0.3 }}
                                             >
                                                 <Link
@@ -276,7 +308,7 @@ export default function Layout({ children }: LayoutProps) {
             {/* Main Content */}
             <AnimatePresence mode="wait">
                 <motion.main
-                    key={pathname}
+                    key={pathname?.startsWith('/chat') ? 'chat-root' : pathname}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}

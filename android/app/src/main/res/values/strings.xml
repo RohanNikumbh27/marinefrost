@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MarineFrost</string>
+    <string name="title_activity_main">MarineFrost</string>
+    <string name="package_name">com.marinefrost.app</string>
+    <string name="custom_url_scheme">com.marinefrost.app</string>
+</resources>

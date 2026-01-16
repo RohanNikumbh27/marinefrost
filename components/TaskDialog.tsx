@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useData, Task } from '@/contexts/DataContext';
+import { useData, Task, MarineDox, DocFolder } from '@/contexts/DataContext';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, X } from 'lucide-react';
+import { CalendarIcon, X, FileText, Link2, FolderOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -35,7 +35,7 @@ export default function TaskDialog({
   projectKey,
   members
 }: TaskDialogProps) {
-  const { addTask, updateTask, deleteTask } = useData();
+  const { addTask, updateTask, deleteTask, marineDox, docFolders, assignDocToTask, assignFolderToTask } = useData();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -48,6 +48,8 @@ export default function TaskDialog({
     tags: [] as string[]
   });
   const [tagInput, setTagInput] = useState('');
+  const [attachedDocIds, setAttachedDocIds] = useState<string[]>([]);
+  const [attachedFolderIds, setAttachedFolderIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (task) {
@@ -74,6 +76,8 @@ export default function TaskDialog({
         dueDate: undefined,
         tags: []
       });
+      setAttachedDocIds([]);
+      setAttachedFolderIds([]);
     }
   }, [task]);
 
@@ -107,6 +111,10 @@ export default function TaskDialog({
 
     if (task) {
       updateTask(projectId, sprintId, task.id, taskData);
+      // Assign docs and sets to task
+      const taskKey = `${projectId}:${sprintId}:${task.id}`;
+      attachedDocIds.forEach(docId => assignDocToTask(docId, taskKey));
+      attachedFolderIds.forEach(folderId => assignFolderToTask(folderId, taskKey));
       toast.success('Task updated successfully');
     } else {
       addTask(projectId, sprintId, taskData);
@@ -305,6 +313,116 @@ export default function TaskDialog({
                 </div>
               )}
             </div>
+
+            {/* Attached Documents */}
+            <div className="grid gap-2">
+              <Label className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Attached Documents
+              </Label>
+              <Select
+                value=""
+                onValueChange={(docId) => {
+                  if (docId && !attachedDocIds.includes(docId)) {
+                    setAttachedDocIds([...attachedDocIds, docId]);
+                  }
+                }}
+              >
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue placeholder="Link a document..." />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {marineDox
+                    .filter(doc => !attachedDocIds.includes(doc.id))
+                    .map((doc) => (
+                      <SelectItem key={doc.id} value={doc.id}>
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          {doc.title}
+                        </div>
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              {attachedDocIds.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {attachedDocIds.map((docId) => {
+                    const doc = marineDox.find(d => d.id === docId);
+                    return doc ? (
+                      <Badge key={docId} variant="secondary" className="rounded-full">
+                        <FileText className="h-3 w-3 mr-1" />
+                        {doc.title}
+                        <button
+                          type="button"
+                          onClick={() => setAttachedDocIds(attachedDocIds.filter(id => id !== docId))}
+                          className="ml-1 hover:text-destructive"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ) : null;
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Attached Folders */}
+            {docFolders.length > 0 && (
+              <div className="grid gap-2">
+                <Label className="flex items-center gap-2">
+                  <FolderOpen className="h-4 w-4" />
+                  Attached Folders
+                </Label>
+                <Select
+                  value=""
+                  onValueChange={(folderId) => {
+                    if (folderId && !attachedFolderIds.includes(folderId)) {
+                      setAttachedFolderIds([...attachedFolderIds, folderId]);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="rounded-xl">
+                    <SelectValue placeholder="Link a folder..." />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    {docFolders
+                      .filter(folder => !attachedFolderIds.includes(folder.id))
+                      .map((folder) => (
+                        <SelectItem key={folder.id} value={folder.id}>
+                          <div className="flex items-center gap-2">
+                            <span>{folder.icon}</span>
+                            {folder.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                {attachedFolderIds.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {attachedFolderIds.map((folderId) => {
+                      const folder = docFolders.find(f => f.id === folderId);
+                      return folder ? (
+                        <Badge
+                          key={folderId}
+                          className="rounded-full"
+                          style={{ backgroundColor: `${folder.color}20`, color: folder.color }}
+                        >
+                          <span className="mr-1">{folder.icon}</span>
+                          {folder.name}
+                          <button
+                            type="button"
+                            onClick={() => setAttachedFolderIds(attachedFolderIds.filter(id => id !== folderId))}
+                            className="ml-1 hover:opacity-70"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <DialogFooter className="flex justify-between">

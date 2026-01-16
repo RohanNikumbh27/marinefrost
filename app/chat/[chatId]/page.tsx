@@ -1,0 +1,330 @@
+"use client";
+
+import { useData } from "@/contexts/DataContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Hash, Send, User, Paperclip, Image as ImageIcon, FileText, CheckSquare, X, Plus } from "lucide-react";
+import { useState, useEffect, useRef, use } from "react";
+import { formatDistanceToNow } from "date-fns";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
+import { Attachment } from "@/contexts/DataContext";
+
+export default function ChatDetailPage({ params }: { params: Promise<{ chatId: string }> }) {
+    const resolvedParams = use(params);
+    const { channels, messages, sendMessage, getMessages, chatUsers, marineDox, tasks: allTasks } = useData();
+    const { user } = useAuth();
+    const [newMessage, setNewMessage] = useState("");
+    const [attachments, setAttachments] = useState<Attachment[]>([]);
+    const [isMarineDoxOpen, setIsMarineDoxOpen] = useState(false);
+    const [isTasksOpen, setIsTasksOpen] = useState(false);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const channel = channels.find(c => c.id === resolvedParams.chatId);
+    const channelMessages = getMessages(resolvedParams.chatId);
+
+    // Helper to get DM display name
+    const getChannelDisplayName = () => {
+        if (!channel) return "";
+        if (channel.type !== 'dm') return channel.name;
+
+        // Find the other member
+        const otherMemberId = channel.members.find(id => id !== user?.id);
+        const otherUser = chatUsers.find(u => u.id === otherMemberId);
+        return otherUser ? otherUser.name : "Unknown User";
+    };
+
+    const displayName = getChannelDisplayName();
+
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [channelMessages, attachments]);
+
+    const handleSendMessage = (e?: React.FormEvent) => {
+        e?.preventDefault();
+        if ((!newMessage.trim() && attachments.length === 0) || !user) return;
+
+        sendMessage(newMessage, resolvedParams.chatId, user.id, 'text', attachments);
+        setNewMessage("");
+        setAttachments([]);
+    };
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const isImage = file.type.startsWith('image/');
+        const newAttachment: Attachment = {
+            id: Math.random().toString(36).substr(2, 9),
+            type: isImage ? 'image' : 'file',
+            name: file.name,
+            url: URL.createObjectURL(file), // In real app, upload to server
+            preview: isImage ? URL.createObjectURL(file) : undefined
+        };
+
+        setAttachments([...attachments, newAttachment]);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    const addMarineDoxAttachment = (doc: any) => {
+        const newAttachment: Attachment = {
+            id: doc.id,
+            type: 'marinedox',
+            name: doc.title,
+            url: `/marinedox/${doc.id}`
+        };
+        setAttachments([...attachments, newAttachment]);
+        setIsMarineDoxOpen(false);
+    };
+
+    const addTaskAttachment = (task: any) => {
+        const newAttachment: Attachment = {
+            id: task.id,
+            type: 'task',
+            name: task.key + ': ' + task.title,
+            url: `/project/${task.projectId}/sprint/${task.sprintId}?taskId=${task.id}`
+        };
+        setAttachments([...attachments, newAttachment]);
+        setIsTasksOpen(false);
+    };
+
+    const removeAttachment = (id: string) => {
+        setAttachments(attachments.filter(a => a.id !== id));
+    };
+
+    if (!channel) {
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
+                Channel not found
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex-1 flex flex-col h-full bg-background/50 backdrop-blur-sm">
+            {/* Header */}
+            <div className="h-14 border-b flex items-center px-4 bg-background/50 backdrop-blur-md">
+                {channel.type === 'dm' ? (
+                    <User className="h-5 w-5 mr-2 text-muted-foreground" />
+                ) : (
+                    <Hash className="h-5 w-5 mr-2 text-muted-foreground" />
+                )}
+                <div>
+                    <h2 className="font-semibold">{displayName}</h2>
+                    {channel.description && channel.type !== 'dm' && (
+                        <p className="text-xs text-muted-foreground">{channel.description}</p>
+                    )}
+                </div>
+            </div>
+
+            {/* Messages */}
+            <ScrollArea className="flex-1 p-4">
+                <div className="space-y-4">
+                    {channelMessages.length === 0 ? (
+                        <div className="text-center py-10 text-muted-foreground text-sm">
+                            <div className="h-12 w-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+                                {channel.type === 'dm' ? (
+                                    <User className="h-6 w-6 opacity-50" />
+                                ) : (
+                                    <Hash className="h-6 w-6 opacity-50" />
+                                )}
+                            </div>
+                            <p>This is the start of your conversation with <span className="font-medium text-foreground">{displayName}</span>.</p>
+                        </div>
+                    ) : (
+                        channelMessages.map((msg, index) => {
+                            const isMe = msg.senderId === user?.id;
+                            const showAvatar = index === 0 || channelMessages[index - 1].senderId !== msg.senderId;
+
+                            return (
+                                <motion.div
+                                    key={msg.id}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className={`flex items-start gap-3 ${isMe ? "flex-row-reverse" : ""}`}
+                                >
+                                    {showAvatar ? (
+                                        <Avatar className="h-8 w-8 mt-1">
+                                            {/* In a real app we'd lookup the sender's details */}
+                                            <AvatarFallback className={isMe ? "bg-primary text-primary-foreground" : ""}>
+                                                {isMe ? "Me" : "U"}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    ) : (
+                                        <div className="w-8" />
+                                    )}
+                                    <div className={`flex flex-col max-w-[70%] ${isMe ? "items-end" : "items-start"}`}>
+                                        {showAvatar && !isMe && (
+                                            <span className="text-xs text-muted-foreground ml-1 mb-1">
+                                                User {msg.senderId.slice(0, 4)}
+                                            </span>
+                                        )}
+                                        <div
+                                            className={`px-3 py-2 rounded-2xl text-sm ${isMe
+                                                ? "bg-primary text-primary-foreground rounded-tr-sm"
+                                                : "bg-muted text-foreground rounded-tl-sm"
+                                                }`}
+                                        >
+                                            {msg.content}
+
+                                            {/* Attachments Rendering */}
+                                            {msg.attachments && msg.attachments.length > 0 && (
+                                                <div className={`mt-2 space-y-2 ${isMe ? "items-end" : "items-start"}`}>
+                                                    {msg.attachments.map(att => (
+                                                        <div key={att.id} className="max-w-[200px]">
+                                                            {att.type === 'image' ? (
+                                                                <img src={att.url || att.preview} alt={att.name} className="rounded-lg border bg-background" />
+                                                            ) : (
+                                                                <div className={`flex items-center p-2 rounded-lg text-xs gap-2 border ${isMe ? "bg-primary-foreground/10 border-primary-foreground/20" : "bg-background border-border"
+                                                                    }`}>
+                                                                    {att.type === 'marinedox' && <FileText className="h-4 w-4 shrink-0" />}
+                                                                    {att.type === 'task' && <CheckSquare className="h-4 w-4 shrink-0" />}
+                                                                    {att.type === 'file' && <Paperclip className="h-4 w-4 shrink-0" />}
+                                                                    <span className="truncate">{att.name}</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <span className="text-[10px] text-muted-foreground mt-1 px-1">
+                                            {formatDistanceToNow(new Date(msg.timestamp), { addSuffix: true })}
+                                        </span>
+                                    </div>
+                                </motion.div>
+                            );
+                        })
+                    )}
+                    <div ref={scrollRef} />
+                </div>
+            </ScrollArea>
+
+            {/* Input with Attachments, Unified Style */}
+            <div className="p-4 pt-2 bg-background/50 backdrop-blur-md">
+
+                {/* Pending Attachments Preview */}
+                {attachments.length > 0 && (
+                    <div className="flex gap-2 overflow-x-auto pb-2 px-2">
+                        {attachments.map(att => (
+                            <div key={att.id} className="relative group shrink-0">
+                                {att.type === 'image' ? (
+                                    <div className="h-16 w-16 rounded-md border overflow-hidden">
+                                        <img src={att.url || att.preview} alt={att.name} className="h-full w-full object-cover" />
+                                    </div>
+                                ) : (
+                                    <div className="h-16 w-32 rounded-md border bg-muted flex items-center justify-center p-2 text-xs text-center break-all">
+                                        {att.name}
+                                    </div>
+                                )}
+                                <button
+                                    onClick={() => removeAttachment(att.id)}
+                                    className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full p-0.5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                <div className="flex items-end bg-muted/50 rounded-xl border border-transparent focus-within:border-primary/20 transition-all p-1.5">
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg shrink-0 text-muted-foreground hover:text-foreground">
+                                <Plus className="h-5 w-5" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-48">
+                            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                                <ImageIcon className="mr-2 h-4 w-4" /> Image/File
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setIsMarineDoxOpen(true)}>
+                                <FileText className="mr-2 h-4 w-4" /> MarineDox
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setIsTasksOpen(true)}>
+                                <CheckSquare className="mr-2 h-4 w-4" /> Task
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        onChange={handleFileUpload}
+                        multiple={false} // Simplify for now
+                    />
+
+                    <form onSubmit={handleSendMessage} className="flex-1 flex items-end gap-2">
+                        <Input
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            placeholder={`Message ${channel.type === 'dm' ? displayName : '#' + channel.name}`}
+                            className="bg-transparent border-0 focus-visible:ring-0 px-2 py-0 h-9 min-h-[36px]"
+                        />
+                        <Button
+                            type="submit"
+                            size="icon"
+                            disabled={!newMessage.trim() && attachments.length === 0}
+                            className={`h-9 w-9 rounded-lg shrink-0 transition-all ${newMessage.trim() || attachments.length > 0 ? "bg-primary" : "bg-muted-foreground/30 hover:bg-muted-foreground/40 text-muted-foreground"
+                                }`}
+                        >
+                            <Send className="h-4 w-4" />
+                        </Button>
+                    </form>
+                </div>
+            </div>
+
+            {/* Dialogs for Selecting MarineDox/Tasks */}
+            <Dialog open={isMarineDoxOpen} onOpenChange={setIsMarineDoxOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Attach MarineDox</DialogTitle>
+                    </DialogHeader>
+                    <ScrollArea className="h-[300px]">
+                        <div className="space-y-1 p-1">
+                            {marineDox.map(doc => (
+                                <Button key={doc.id} variant="ghost" className="w-full justify-start" onClick={() => addMarineDoxAttachment(doc)}>
+                                    <FileText className="mr-2 h-4 w-4" /> {doc.title}
+                                </Button>
+                            ))}
+                            {marineDox.length === 0 && <p className="text-center text-muted-foreground py-4">No documents found.</p>}
+                        </div>
+                    </ScrollArea>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isTasksOpen} onOpenChange={setIsTasksOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Attach Task</DialogTitle>
+                    </DialogHeader>
+                    <ScrollArea className="h-[300px]">
+                        <div className="space-y-1 p-1">
+                            {allTasks.map((task: any) => (
+                                <Button key={task.id} variant="ghost" className="w-full justify-start" onClick={() => addTaskAttachment(task)}>
+                                    <CheckSquare className="mr-2 h-4 w-4" /> {task.key}: {task.title}
+                                </Button>
+                            ))}
+                            {allTasks.length === 0 && <p className="text-center text-muted-foreground py-4">No tasks found.</p>}
+                        </div>
+                    </ScrollArea>
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
+}

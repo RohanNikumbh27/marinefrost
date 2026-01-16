@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Plus, Search, Calendar, User } from 'lucide-react';
+import { FileText, Plus, Search, Calendar, User, FolderOpen } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'motion/react';
 
@@ -44,14 +44,24 @@ export default function MarineDoxListPage() {
                         </h1>
                         <p className="text-muted-foreground">Create and manage your documentation</p>
                     </div>
-                    <Button
-                        onClick={() => router.push('/marinedox/new')}
-                        className="rounded-xl"
-                        style={{ backgroundColor: 'var(--marinedox-primary)' }}
-                    >
-                        <Plus className="mr-2 h-4 w-4" />
-                        New Document
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => router.push('/marinedox/folders')}
+                            className="rounded-xl"
+                        >
+                            <FolderOpen className="mr-2 h-4 w-4" />
+                            Folders
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/marinedox/new')}
+                            className="rounded-xl"
+                            style={{ backgroundColor: 'var(--marinedox-primary)' }}
+                        >
+                            <Plus className="mr-2 h-4 w-4" />
+                            New Document
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Search & Filter */}

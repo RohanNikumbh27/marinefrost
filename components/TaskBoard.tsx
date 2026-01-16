@@ -53,7 +53,7 @@ function Column({ status, title, color, tasks, onTaskMove, onTaskClick }: Column
         </div>
         <ScrollArea className="h-[calc(100vh-450px)] sm:h-[calc(100vh-400px)]">
           <div
-            ref={drop}
+            ref={(node) => { drop(node); }}
             className={`space-y-3 min-h-[200px] p-2 rounded-xl transition-colors ${isOver ? 'bg-blue-50 dark:bg-blue-950/20' : ''
               }`}
           >

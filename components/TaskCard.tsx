@@ -39,14 +39,13 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
 
   return (
     <motion.div
-      ref={drag}
+      ref={(node) => { drag(node); }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: isDragging ? 0.5 : 1, y: 0 }}
       transition={{ duration: 0.2 }}
       onClick={onClick}
-      className={`bg-card border rounded-xl p-3 cursor-pointer hover:shadow-md transition-all ${
-        isDragging ? 'rotate-2 scale-105' : ''
-      }`}
+      className={`bg-card border rounded-xl p-3 cursor-pointer hover:shadow-md transition-all ${isDragging ? 'rotate-2 scale-105' : ''
+        }`}
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center space-x-2">
