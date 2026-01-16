@@ -114,10 +114,26 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
 
     return (
         <div className="flex-1 flex flex-col h-full bg-background/50 backdrop-blur-sm">
-            {/* Header */}
-            <div className="h-14 border-b flex items-center px-4 bg-background/50 backdrop-blur-md shrink-0">
+            {/* Header - hidden on mobile since layout has header */}
+            <div className="hidden md:flex h-14 border-b items-center px-4 bg-background/50 backdrop-blur-md shrink-0">
                 {channel.type === 'dm' ? (
-                    <User className="h-5 w-5 mr-2 text-muted-foreground" />
+                    <>
+                        <div className="relative mr-2">
+                            <User className="h-5 w-5 text-muted-foreground" />
+                            {(() => {
+                                const otherUserId = channel.members.find(id => id !== user?.id);
+                                const otherUser = chatUsers.find(u => u.id === otherUserId);
+                                if (otherUser) {
+                                    return (
+                                        <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background ${otherUser.status.type === 'online' ? 'bg-green-500' :
+                                                otherUser.status.type === 'busy' || otherUser.status.type === 'meeting' || otherUser.status.type === 'dnd' ? 'bg-red-500' : 'bg-gray-400'
+                                            }`} />
+                                    );
+                                }
+                                return null;
+                            })()}
+                        </div>
+                    </>
                 ) : (
                     <Hash className="h-5 w-5 mr-2 text-muted-foreground" />
                 )}
@@ -130,7 +146,7 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
             </div>
 
             {/* Messages */}
-            <ScrollArea className="flex-1 min-h-0 p-4">
+            <ScrollArea className="flex-1 min-h-0 p-2 md:p-4">
                 <div className="space-y-4">
                     {channelMessages.length === 0 ? (
                         <div className="text-center py-10 text-muted-foreground text-sm">
@@ -155,18 +171,18 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
                                     animate={{ opacity: 1, y: 0 }}
                                     className={`flex items-start gap-3 ${isMe ? "flex-row-reverse" : ""}`}
                                 >
-                                    {showAvatar ? (
+                                    {showAvatar && channel.type !== 'dm' ? (
                                         <Avatar className="h-8 w-8 mt-1">
                                             {/* In a real app we'd lookup the sender's details */}
                                             <AvatarFallback className={isMe ? "bg-primary text-primary-foreground" : ""}>
                                                 {isMe ? "Me" : "U"}
                                             </AvatarFallback>
                                         </Avatar>
-                                    ) : (
+                                    ) : channel.type !== 'dm' ? (
                                         <div className="w-8" />
-                                    )}
+                                    ) : null}
                                     <div className={`flex flex-col max-w-[70%] ${isMe ? "items-end" : "items-start"}`}>
-                                        {showAvatar && !isMe && (
+                                        {showAvatar && !isMe && channel.type !== 'dm' && (
                                             <span className="text-xs text-muted-foreground ml-1 mb-1">
                                                 User {msg.senderId.slice(0, 4)}
                                             </span>
@@ -213,12 +229,12 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
             </ScrollArea>
 
             {/* Input with Attachments, Unified Style */}
-            <div className="p-4 pt-2 bg-background/50 backdrop-blur-md">
+            <div className="px-2 pt-2 pb-0 md:p-4 md:pt-2 bg-background/50 backdrop-blur-md shrink-0">
                 <div className="bg-muted/50 rounded-2xl border border-transparent focus-within:border-primary/20 transition-all overflow-hidden shadow-sm">
 
                     {/* Pending Attachments Preview */}
                     {attachments.length > 0 && (
-                        <div className="flex gap-2 overflow-x-auto p-3 pb-0 scrollbar-hide">
+                        <div className="flex gap-1.5 md:gap-2 overflow-x-auto p-2 md:p-3 pb-0 scrollbar-hide">
                             {attachments.map(att => (
                                 <div key={att.id} className="relative group shrink-0 bg-background/60 rounded-full pl-1 pr-8 py-1 flex items-center gap-2 border shadow-sm max-w-[180px] hover:bg-background/80 transition-colors">
                                     {att.type === 'image' ? (

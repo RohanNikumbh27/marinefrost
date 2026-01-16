@@ -1,18 +1,21 @@
 "use client";
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
-import { useTheme } from 'next-themes';
+import type { UserStatus } from '@/contexts/DataContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { LayoutDashboard, Moon, Sun, Bell, User, LogOut, Menu, FileText, X, MessageSquare } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { LayoutDashboard, Moon, Sun, Bell, User, LogOut, Menu, FileText, X, MessageSquare, Home, FolderKanban, Calendar, Circle, Coffee, Video, Minus, Edit, Check } from 'lucide-react';
 import NotificationsPanel from '@/components/NotificationsPanel';
 import Logo from '@/components/Logo';
 
@@ -22,12 +25,40 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
     const { user, logout } = useAuth();
-    const { notifications } = useData();
-    const { theme, setTheme } = useTheme();
+    const { notifications, chatUsers, updateUserStatus } = useData();
     const router = useRouter();
     const pathname = usePathname();
     const [showNotifications, setShowNotifications] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    const [customStatusOpen, setCustomStatusOpen] = useState(false);
+    const [customStatusText, setCustomStatusText] = useState('');
+    const [customStatusEmoji, setCustomStatusEmoji] = useState('✏️');
+
+    useEffect(() => {
+        // This effect runs only once on mount to set the initial theme from localStorage or system preference
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme === 'dark' || (storedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            setTheme('dark');
+            document.documentElement.classList.add('dark');
+        } else {
+            setTheme('light');
+            document.documentElement.classList.remove('dark');
+        }
+    }, []);
+
+    useEffect(() => {
+        // This effect runs whenever the theme state changes
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+    }, [theme]);
+
+    const currentUserStatus = chatUsers.find(u => u.id === user?.id)?.status || { type: 'online' };
 
     const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -121,6 +152,98 @@ export default function Layout({ children }: LayoutProps) {
                                         <p className="text-xs text-muted-foreground">{user?.email}</p>
                                     </div>
                                 </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+
+                                {/* Status Selector */}
+                                <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger className="cursor-pointer rounded-xl py-2.5 px-3 transition-all duration-200">
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <div className="relative">
+                                                <Circle className={`h-3 w-3 fill-current transition-colors ${currentUserStatus.type === 'online' ? 'text-emerald-500' :
+                                                        currentUserStatus.type === 'busy' || currentUserStatus.type === 'meeting' || currentUserStatus.type === 'dnd' ? 'text-rose-500' :
+                                                            currentUserStatus.type === 'lunch' ? 'text-amber-500' : 'text-slate-400'
+                                                    }`} />
+                                                {currentUserStatus.type === 'online' && (
+                                                    <span className="absolute inset-0 h-3 w-3 rounded-full bg-emerald-500/20 animate-pulse" />
+                                                )}
+                                            </div>
+                                            <span className="font-medium text-sm">{currentUserStatus.emoji || ''} {currentUserStatus.text || currentUserStatus.type.charAt(0).toUpperCase() + currentUserStatus.type.slice(1)}</span>
+                                        </div>
+                                    </DropdownMenuSubTrigger>
+                                    <DropdownMenuSubContent className="w-56 p-1">
+                                        <DropdownMenuItem
+                                            onClick={() => user && updateUserStatus(user.id, { type: 'online' })}
+                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
+                                        >
+                                            <div className="flex items-center gap-2 flex-1">
+                                                <Circle className="h-3 w-3 fill-current text-emerald-500" />
+                                                <span className="font-medium text-sm">Online</span>
+                                            </div>
+                                            {currentUserStatus.type === 'online' && <Check className="h-4 w-4 text-emerald-500" />}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => user && updateUserStatus(user.id, { type: 'meeting', emoji: '📅', text: 'In a meeting' })}
+                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
+                                        >
+                                            <div className="flex items-center gap-2 flex-1">
+                                                <Video className="h-4 w-4 text-rose-500" />
+                                                <span className="font-medium text-sm">In a meeting</span>
+                                            </div>
+                                            {currentUserStatus.type === 'meeting' && <Check className="h-4 w-4 text-rose-500" />}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => user && updateUserStatus(user.id, { type: 'busy', emoji: '🔴', text: 'Busy' })}
+                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
+                                        >
+                                            <div className="flex items-center gap-2 flex-1">
+                                                <Circle className="h-3 w-3 fill-current text-rose-500" />
+                                                <span className="font-medium text-sm">Busy</span>
+                                            </div>
+                                            {currentUserStatus.type === 'busy' && <Check className="h-4 w-4 text-rose-500" />}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => user && updateUserStatus(user.id, { type: 'dnd', emoji: '🚫', text: 'Do not disturb' })}
+                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
+                                        >
+                                            <div className="flex items-center gap-2 flex-1">
+                                                <Minus className="h-4 w-4 text-rose-500" />
+                                                <span className="font-medium text-sm">Do not disturb</span>
+                                            </div>
+                                            {currentUserStatus.type === 'dnd' && <Check className="h-4 w-4 text-rose-500" />}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => user && updateUserStatus(user.id, { type: 'lunch', emoji: '🍽️', text: 'Out for lunch' })}
+                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
+                                        >
+                                            <div className="flex items-center gap-2 flex-1">
+                                                <Coffee className="h-4 w-4 text-amber-500" />
+                                                <span className="font-medium text-sm">Out for lunch</span>
+                                            </div>
+                                            {currentUserStatus.type === 'lunch' && <Check className="h-4 w-4 text-amber-500" />}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => user && updateUserStatus(user.id, { type: 'offline' })}
+                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
+                                        >
+                                            <div className="flex items-center gap-2 flex-1">
+                                                <Circle className="h-3 w-3 fill-current text-slate-400" />
+                                                <span className="font-medium text-sm">Offline</span>
+                                            </div>
+                                            {currentUserStatus.type === 'offline' && <Check className="h-4 w-4 text-slate-400" />}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator className="my-1" />
+                                        <DropdownMenuItem
+                                            onClick={() => setCustomStatusOpen(true)}
+                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <Edit className="h-4 w-4" />
+                                                <span className="font-medium text-sm">Set custom status</span>
+                                            </div>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer rounded-xl">
                                     <User className="mr-2 h-4 w-4" />

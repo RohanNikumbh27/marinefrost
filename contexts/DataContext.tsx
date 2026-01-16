@@ -109,11 +109,19 @@ export interface Message {
     timestamp: string;
 }
 
+export type UserStatusType = 'online' | 'meeting' | 'busy' | 'dnd' | 'offline' | 'lunch' | 'custom';
+
+export interface UserStatus {
+    type: UserStatusType;
+    text?: string; // Custom status message
+    emoji?: string; // Custom emoji
+}
+
 export interface ChatUser {
     id: string;
     name: string;
     avatar?: string;
-    status: 'online' | 'offline' | 'busy';
+    status: UserStatus;
 }
 
 export interface DocFolder {
@@ -179,6 +187,7 @@ interface DataContextType {
     getMessages: (channelId: string) => Message[];
     getChannels: (userId: string) => Channel[];
     startDirectMessage: (currentUserId: string, targetUserId: string) => string; // Returns channel ID
+    updateUserStatus: (userId: string, status: UserStatus) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -397,10 +406,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const [channels, setChannels] = useState<Channel[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [chatUsers, setChatUsers] = useState<ChatUser[]>([
-        { id: 'u2', name: 'Alice Johnson', status: 'online', avatar: '' },
-        { id: 'u3', name: 'Bob Smith', status: 'busy', avatar: '' },
-        { id: 'u4', name: 'Charlie Brown', status: 'offline', avatar: '' },
-        { id: 'u5', name: 'Diana Prince', status: 'online', avatar: '' },
+        { id: 'user_2', name: 'Alice Johnson', avatar: '/avatars/alice.jpg', status: { type: 'online' } },
+        { id: 'user_3', name: 'Bob Smith', status: { type: 'busy' } },
+        { id: 'user_4', name: 'Charlie Brown', avatar: '/avatars/charlie.jpg', status: { type: 'meeting', emoji: '📅', text: 'In a meeting' } },
+        { id: 'user_5', name: 'Diana Prince', status: { type: 'offline' } },
+        { id: 'user_6', name: 'Evan Wright', status: { type: 'dnd', emoji: '🚫', text: 'Do not disturb' } },
+        { id: 'user_7', name: 'Fiona Gallagher', status: { type: 'lunch', emoji: '🍔', text: 'Out for lunch' } },
+        { id: 'user_8', name: 'George Miller', status: { type: 'custom', emoji: '🎧', text: 'Focusing' } },
     ]);
 
     useEffect(() => {
@@ -836,6 +848,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return newChannel.id;
     };
 
+    const updateUserStatus = (userId: string, status: UserStatus) => {
+        setChatUsers(prev => prev.map(u => u.id === userId ? { ...u, status } : u));
+    };
+
     // Flatten all tasks from all projects for easy access
     const allTasks = projects.flatMap(project =>
         project.sprints.flatMap(sprint =>
@@ -898,7 +914,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 sendMessage,
                 getMessages,
                 getChannels,
-                startDirectMessage
+                startDirectMessage,
+                updateUserStatus
             }}
         >
             {children}

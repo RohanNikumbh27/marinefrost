@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useData } from "@/contexts/DataContext";
@@ -9,13 +10,14 @@ import { Hash, Lock, Plus, MessageSquare, Circle } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from "sonner"; // Assuming sonner is used as in other parts
 
-export default function ChatSidebar() {
+export default function ChatSidebar({ onNavigate }: { onNavigate?: () => void }) {
     const { channels, getChannels, createChannel, chatUsers, startDirectMessage } = useData();
     const { user } = useAuth();
     const pathname = usePathname();
@@ -39,11 +41,16 @@ export default function ChatSidebar() {
         if (!user) return;
         const channelId = startDirectMessage(user.id, targetUserId);
         router.push(`/chat/${channelId}`);
+        onNavigate?.();
+    };
+
+    const handleChannelClick = () => {
+        onNavigate?.();
     };
 
     return (
         <div className="w-64 border-r h-full flex flex-col bg-background/50 backdrop-blur-md">
-            <div className="p-4 border-b flex items-center justify-between">
+            <div className="p-4 flex items-center justify-between">
                 <h2 className="font-semibold text-lg">MarineChat</h2>
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
@@ -96,6 +103,7 @@ export default function ChatSidebar() {
                             <Link
                                 key={channel.id}
                                 href={`/chat/${channel.id}`}
+                                onClick={handleChannelClick}
                             >
                                 <Button
                                     variant={pathname === `/chat/${channel.id}` ? "secondary" : "ghost"}
@@ -125,6 +133,9 @@ export default function ChatSidebar() {
                             const activeDmChannel = dmChannels.find(ch => ch.members.includes(chatUser.id));
                             const isActive = activeDmChannel && pathname === `/chat/${activeDmChannel.id}`;
 
+                            const statusText = chatUser.status.text || chatUser.status.type.charAt(0).toUpperCase() + chatUser.status.type.slice(1);
+                            const statusEmoji = chatUser.status.emoji || '';
+
                             return (
                                 <Button
                                     key={chatUser.id}
@@ -132,15 +143,26 @@ export default function ChatSidebar() {
                                     className="w-full justify-start h-9 px-2 relative"
                                     onClick={() => handleStartDM(chatUser.id)}
                                 >
-                                    <div className="relative mr-2">
-                                        <Avatar className="h-4 w-4">
-                                            <AvatarImage src={chatUser.avatar} />
-                                            <AvatarFallback className="text-[10px]">{chatUser.name.charAt(0)}</AvatarFallback>
-                                        </Avatar>
-                                        <span className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border-2 border-background ${chatUser.status === 'online' ? 'bg-green-500' :
-                                                chatUser.status === 'busy' ? 'bg-red-500' : 'bg-gray-400'
-                                            }`} />
-                                    </div>
+                                    <TooltipProvider delayDuration={0}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="relative mr-2 cursor-pointer">
+                                                    <Avatar className="h-4 w-4">
+                                                        <AvatarImage src={chatUser.avatar} />
+                                                        <AvatarFallback className="text-[10px]">{chatUser.name.charAt(0)}</AvatarFallback>
+                                                    </Avatar>
+                                                    <span className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border-2 border-background ${chatUser.status.type === 'online' ? 'bg-green-500' :
+                                                        chatUser.status.type === 'busy' || chatUser.status.type === 'meeting' || chatUser.status.type === 'dnd' ? 'bg-red-500' :
+                                                            chatUser.status.type === 'lunch' ? 'bg-yellow-500' : 'bg-gray-400'
+                                                        }`} />
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="top" showArrow={false} className="flex items-center gap-1.5 bg-foreground/90 text-background border-none rounded-full px-4 py-2 shadow-md min-h-[32px]" sideOffset={12}>
+                                                <span>{statusEmoji}</span>
+                                                <span className="text-sm font-medium">{statusText}</span>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     <span className="truncate">{chatUser.name}</span>
                                 </Button>
                             );
