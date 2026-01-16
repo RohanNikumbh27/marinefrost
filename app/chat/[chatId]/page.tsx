@@ -115,7 +115,7 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
     return (
         <div className="flex-1 flex flex-col h-full bg-background/50 backdrop-blur-sm">
             {/* Header */}
-            <div className="h-14 border-b flex items-center px-4 bg-background/50 backdrop-blur-md">
+            <div className="h-14 border-b flex items-center px-4 bg-background/50 backdrop-blur-md shrink-0">
                 {channel.type === 'dm' ? (
                     <User className="h-5 w-5 mr-2 text-muted-foreground" />
                 ) : (
@@ -130,7 +130,7 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
             </div>
 
             {/* Messages */}
-            <ScrollArea className="flex-1 p-4">
+            <ScrollArea className="flex-1 min-h-0 p-4">
                 <div className="space-y-4">
                     {channelMessages.length === 0 ? (
                         <div className="text-center py-10 text-muted-foreground text-sm">
@@ -214,78 +214,83 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
 
             {/* Input with Attachments, Unified Style */}
             <div className="p-4 pt-2 bg-background/50 backdrop-blur-md">
+                <div className="bg-muted/50 rounded-2xl border border-transparent focus-within:border-primary/20 transition-all overflow-hidden shadow-sm">
 
-                {/* Pending Attachments Preview */}
-                {attachments.length > 0 && (
-                    <div className="flex gap-2 overflow-x-auto pb-2 px-2">
-                        {attachments.map(att => (
-                            <div key={att.id} className="relative group shrink-0">
-                                {att.type === 'image' ? (
-                                    <div className="h-16 w-16 rounded-md border overflow-hidden">
-                                        <img src={att.url || att.preview} alt={att.name} className="h-full w-full object-cover" />
-                                    </div>
-                                ) : (
-                                    <div className="h-16 w-32 rounded-md border bg-muted flex items-center justify-center p-2 text-xs text-center break-all">
-                                        {att.name}
-                                    </div>
-                                )}
-                                <button
-                                    onClick={() => removeAttachment(att.id)}
-                                    className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full p-0.5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                    <X className="h-4 w-4" />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                    {/* Pending Attachments Preview */}
+                    {attachments.length > 0 && (
+                        <div className="flex gap-2 overflow-x-auto p-3 pb-0 scrollbar-hide">
+                            {attachments.map(att => (
+                                <div key={att.id} className="relative group shrink-0 bg-background/60 rounded-full pl-1 pr-8 py-1 flex items-center gap-2 border shadow-sm max-w-[180px] hover:bg-background/80 transition-colors">
+                                    {att.type === 'image' ? (
+                                        <div className="h-6 w-6 rounded-full overflow-hidden bg-muted shrink-0">
+                                            <img src={att.url || att.preview} alt={att.name} className="h-full w-full object-cover" />
+                                        </div>
+                                    ) : (
+                                        <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                                            {att.type === 'marinedox' && <FileText className="h-3 w-3" />}
+                                            {att.type === 'task' && <CheckSquare className="h-3 w-3" />}
+                                            {att.type === 'file' && <Paperclip className="h-3 w-3" />}
+                                        </div>
+                                    )}
+                                    <span className="text-xs truncate font-medium text-foreground/80">{att.name}</span>
+                                    <button
+                                        onClick={() => removeAttachment(att.id)}
+                                        className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full transition-all"
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
-                <div className="flex items-end bg-muted/50 rounded-xl border border-transparent focus-within:border-primary/20 transition-all p-1.5">
+                    <div className="flex items-end p-2 gap-2">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full shrink-0 text-muted-foreground hover:text-foreground hover:bg-background/20 transition-colors">
+                                    <Plus className="h-5 w-5" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-48">
+                                <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                                    <ImageIcon className="mr-2 h-4 w-4" /> Image/File
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setIsMarineDoxOpen(true)}>
+                                    <FileText className="mr-2 h-4 w-4" /> MarineDox
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setIsTasksOpen(true)}>
+                                    <CheckSquare className="mr-2 h-4 w-4" /> Task
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg shrink-0 text-muted-foreground hover:text-foreground">
-                                <Plus className="h-5 w-5" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-48">
-                            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                                <ImageIcon className="mr-2 h-4 w-4" /> Image/File
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setIsMarineDoxOpen(true)}>
-                                <FileText className="mr-2 h-4 w-4" /> MarineDox
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setIsTasksOpen(true)}>
-                                <CheckSquare className="mr-2 h-4 w-4" /> Task
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DropdownMenu>
 
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        className="hidden"
-                        onChange={handleFileUpload}
-                        multiple={false} // Simplify for now
-                    />
-
-                    <form onSubmit={handleSendMessage} className="flex-1 flex items-end gap-2">
-                        <Input
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            placeholder={`Message ${channel.type === 'dm' ? displayName : '#' + channel.name}`}
-                            className="bg-transparent border-0 focus-visible:ring-0 px-2 py-0 h-9 min-h-[36px]"
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            onChange={handleFileUpload}
+                            multiple={false} // Simplify for now
                         />
-                        <Button
-                            type="submit"
-                            size="icon"
-                            disabled={!newMessage.trim() && attachments.length === 0}
-                            className={`h-9 w-9 rounded-lg shrink-0 transition-all ${newMessage.trim() || attachments.length > 0 ? "bg-primary" : "bg-muted-foreground/30 hover:bg-muted-foreground/40 text-muted-foreground"
-                                }`}
-                        >
-                            <Send className="h-4 w-4" />
-                        </Button>
-                    </form>
+
+                        <form onSubmit={handleSendMessage} className="flex-1 flex items-end gap-2">
+                            <Input
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                placeholder={`Message ${channel.type === 'dm' ? displayName : '#' + channel.name}`}
+                                className="bg-transparent border-0 focus-visible:ring-0 px-2 py-0 h-9 min-h-[36px]"
+                            />
+                            <Button
+                                type="submit"
+                                size="icon"
+                                disabled={!newMessage.trim() && attachments.length === 0}
+                                className={`h-9 w-9 rounded-lg shrink-0 transition-all ${newMessage.trim() || attachments.length > 0 ? "bg-primary" : "bg-muted-foreground/30 hover:bg-muted-foreground/40 text-muted-foreground"
+                                    }`}
+                            >
+                                <Send className="h-4 w-4" />
+                            </Button>
+                        </form>
+                    </div>
                 </div>
             </div>
 
