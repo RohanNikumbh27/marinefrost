@@ -160,8 +160,8 @@ export default function Layout({ children }: LayoutProps) {
                                         <div className="flex items-center gap-2 flex-1">
                                             <div className="relative">
                                                 <Circle className={`h-3 w-3 fill-current transition-colors ${currentUserStatus.type === 'online' ? 'text-emerald-500' :
-                                                        currentUserStatus.type === 'busy' || currentUserStatus.type === 'meeting' || currentUserStatus.type === 'dnd' ? 'text-rose-500' :
-                                                            currentUserStatus.type === 'lunch' ? 'text-amber-500' : 'text-slate-400'
+                                                    currentUserStatus.type === 'busy' || currentUserStatus.type === 'meeting' || currentUserStatus.type === 'dnd' ? 'text-rose-500' :
+                                                        currentUserStatus.type === 'lunch' ? 'text-amber-500' : 'text-slate-400'
                                                     }`} />
                                                 {currentUserStatus.type === 'online' && (
                                                     <span className="absolute inset-0 h-3 w-3 rounded-full bg-emerald-500/20 animate-pulse" />
@@ -441,6 +441,108 @@ export default function Layout({ children }: LayoutProps) {
                     {children}
                 </motion.main>
             </AnimatePresence>
+
+            {/* Custom Status Dialog */}
+            <Dialog open={customStatusOpen} onOpenChange={setCustomStatusOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
+                            <Edit className="h-5 w-5" />
+                            Set custom status
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-6 py-4">
+                        {/* Emoji Selector */}
+                        <div className="grid gap-3">
+                            <Label htmlFor="emoji" className="text-sm font-medium">Choose an emoji</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {['✏️', '💻', '☕', '🎧', '📚', '🎮', '🏃', '😴', '🤔', '🔥', '⚡', '🎯'].map((emoji) => (
+                                    <Button
+                                        key={emoji}
+                                        type="button"
+                                        variant={customStatusEmoji === emoji ? "default" : "outline"}
+                                        className={`h-12 w-12 text-2xl p-0 transition-all duration-200 ${customStatusEmoji === emoji ? 'scale-110 shadow-md' : 'hover:scale-105'
+                                            }`}
+                                        onClick={() => setCustomStatusEmoji(emoji)}
+                                    >
+                                        {emoji}
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Status Text Input */}
+                        <div className="grid gap-2">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="status-text" className="text-sm font-medium">Status message</Label>
+                                <span className="text-xs text-muted-foreground">
+                                    {customStatusText.length}/50
+                                </span>
+                            </div>
+                            <Input
+                                id="status-text"
+                                value={customStatusText}
+                                onChange={(e) => setCustomStatusText(e.target.value.slice(0, 50))}
+                                placeholder="What's your status?"
+                                maxLength={50}
+                                className="transition-all duration-200 focus:scale-[1.01]"
+                            />
+                        </div>
+
+                        {/* Live Preview */}
+                        {customStatusText.trim() && (
+                            <div className="grid gap-2">
+                                <Label className="text-sm font-medium">Preview</Label>
+                                <div className="flex items-center justify-center p-4 bg-muted/50 rounded-lg border-2 border-dashed animate-in fade-in-0 zoom-in-95 duration-300">
+                                    <div className="flex items-center gap-2 bg-foreground/90 text-background rounded-full px-4 py-2 shadow-md min-h-[32px]">
+                                        <span className="text-lg">{customStatusEmoji}</span>
+                                        <span className="text-sm font-medium">{customStatusText}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        {customStatusText.trim() && (
+                            <Button
+                                variant="ghost"
+                                onClick={() => {
+                                    setCustomStatusText('');
+                                    setCustomStatusEmoji('✏️');
+                                }}
+                                className="transition-all duration-200 hover:scale-105"
+                            >
+                                Clear
+                            </Button>
+                        )}
+                        <Button
+                            variant="outline"
+                            onClick={() => setCustomStatusOpen(false)}
+                            className="transition-all duration-200 hover:scale-105"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                if (user && customStatusText.trim()) {
+                                    updateUserStatus(user.id, {
+                                        type: 'custom',
+                                        emoji: customStatusEmoji,
+                                        text: customStatusText
+                                    });
+                                }
+                                setCustomStatusOpen(false);
+                                setCustomStatusText('');
+                                setCustomStatusEmoji('✏️');
+                            }}
+                            disabled={!customStatusText.trim()}
+                            className="transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Set status
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

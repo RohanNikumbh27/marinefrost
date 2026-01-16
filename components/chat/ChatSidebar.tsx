@@ -147,19 +147,29 @@ export default function ChatSidebar({ onNavigate }: { onNavigate?: () => void })
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <div className="relative mr-2 cursor-pointer">
-                                                    <Avatar className="h-4 w-4">
+                                                    <Avatar className="h-6 w-6">
                                                         <AvatarImage src={chatUser.avatar} />
                                                         <AvatarFallback className="text-[10px]">{chatUser.name.charAt(0)}</AvatarFallback>
                                                     </Avatar>
-                                                    <span className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border-2 border-background ${chatUser.status.type === 'online' ? 'bg-green-500' :
-                                                        chatUser.status.type === 'busy' || chatUser.status.type === 'meeting' || chatUser.status.type === 'dnd' ? 'bg-red-500' :
-                                                            chatUser.status.type === 'lunch' ? 'bg-yellow-500' : 'bg-gray-400'
+                                                    <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background transition-all duration-300 ${chatUser.status.type === 'online' ? 'bg-emerald-500' :
+                                                            chatUser.status.type === 'busy' || chatUser.status.type === 'meeting' || chatUser.status.type === 'dnd' ? 'bg-rose-500' :
+                                                                chatUser.status.type === 'lunch' ? 'bg-amber-500' : 'bg-slate-400'
                                                         }`} />
                                                 </div>
                                             </TooltipTrigger>
-                                            <TooltipContent side="top" showArrow={false} className="flex items-center gap-1.5 bg-foreground/90 text-background border-none rounded-full px-4 py-2 shadow-md min-h-[32px]" sideOffset={12}>
-                                                <span>{statusEmoji}</span>
-                                                <span className="text-sm font-medium">{statusText}</span>
+                                            <TooltipContent
+                                                side="top"
+                                                showArrow={false}
+                                                className="flex items-center gap-3 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-neutral-200 dark:border-neutral-800 rounded-2xl px-4 py-2.5 shadow-xl min-h-[40px] animate-in slide-in-from-bottom-2 duration-300"
+                                                sideOffset={16}
+                                            >
+                                                <span className="text-xl leading-none filter drop-shadow-sm">{statusEmoji}</span>
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="text-sm font-semibold text-foreground leading-tight">{statusText}</span>
+                                                    <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/80">
+                                                        {chatUser.status.type}
+                                                    </span>
+                                                </div>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>

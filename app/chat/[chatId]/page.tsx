@@ -17,6 +17,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Attachment } from "@/contexts/DataContext";
 
 export default function ChatDetailPage({ params }: { params: Promise<{ chatId: string }> }) {
@@ -118,21 +119,51 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
             <div className="hidden md:flex h-14 border-b items-center px-4 bg-background/50 backdrop-blur-md shrink-0">
                 {channel.type === 'dm' ? (
                     <>
-                        <div className="relative mr-2">
-                            <User className="h-5 w-5 text-muted-foreground" />
-                            {(() => {
-                                const otherUserId = channel.members.find(id => id !== user?.id);
-                                const otherUser = chatUsers.find(u => u.id === otherUserId);
-                                if (otherUser) {
-                                    return (
-                                        <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background ${otherUser.status.type === 'online' ? 'bg-green-500' :
-                                                otherUser.status.type === 'busy' || otherUser.status.type === 'meeting' || otherUser.status.type === 'dnd' ? 'bg-red-500' : 'bg-gray-400'
-                                            }`} />
-                                    );
-                                }
-                                return null;
-                            })()}
-                        </div>
+                        {(() => {
+                            const otherUserId = channel.members.find(id => id !== user?.id);
+                            const otherUser = chatUsers.find(u => u.id === otherUserId);
+                            if (otherUser) {
+                                const statusEmoji = otherUser.status.emoji || (
+                                    otherUser.status.type === 'online' ? '🟢' :
+                                        otherUser.status.type === 'busy' ? '🔴' :
+                                            otherUser.status.type === 'meeting' ? '📅' :
+                                                otherUser.status.type === 'dnd' ? '⛔' :
+                                                    otherUser.status.type === 'lunch' ? '🍽️' :
+                                                        otherUser.status.type === 'offline' ? '⚫' : '✏️'
+                                );
+                                const statusText = otherUser.status.text || (
+                                    otherUser.status.type.charAt(0).toUpperCase() + otherUser.status.type.slice(1)
+                                );
+                                return (
+                                    <TooltipProvider delayDuration={0}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="relative mr-2 cursor-pointer">
+                                                    <User className="h-5 w-5 text-muted-foreground" />
+                                                    <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background ${otherUser.status.type === 'online' ? 'bg-emerald-500' :
+                                                            otherUser.status.type === 'busy' || otherUser.status.type === 'meeting' || otherUser.status.type === 'dnd' ? 'bg-rose-500' :
+                                                                otherUser.status.type === 'lunch' ? 'bg-amber-500' : 'bg-slate-400'
+                                                        }`} />
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent
+                                                side="bottom"
+                                                showArrow={false}
+                                                className="flex items-center gap-3 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-neutral-200 dark:border-neutral-800 rounded-2xl px-4 py-2.5 shadow-xl min-h-[40px] animate-in slide-in-from-top-2 duration-300"
+                                                sideOffset={12}
+                                            >
+                                                <span className="text-xl leading-none filter drop-shadow-sm">{statusEmoji}</span>
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="text-sm font-semibold text-foreground leading-tight">{statusText}</span>
+                                                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{otherUser.status.type}</span>
+                                                </div>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                );
+                            }
+                            return <User className="h-5 w-5 mr-2 text-muted-foreground" />;
+                        })()}
                     </>
                 ) : (
                     <Hash className="h-5 w-5 mr-2 text-muted-foreground" />
