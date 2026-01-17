@@ -332,16 +332,34 @@ export default function TaskDialog({
                   <SelectValue placeholder="Link a document..." />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
-                  {marineDox
-                    .filter(doc => !attachedDocIds.includes(doc.id))
-                    .map((doc) => (
-                      <SelectItem key={doc.id} value={doc.id}>
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          {doc.title}
-                        </div>
-                      </SelectItem>
-                    ))}
+                  {marineDox.filter(doc => !attachedDocIds.includes(doc.id)).length === 0 ? (
+                    <div className="p-2 flex flex-col items-center justify-center gap-2">
+                      <p className="text-xs text-muted-foreground text-center">No available documents</p>
+                      <Button
+                        size="sm"
+                        className="w-full text-xs h-8 rounded-lg text-white hover:bg-violet-700"
+                        style={{ backgroundColor: 'var(--marinedox-primary)' }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.open('/marinedox', '_blank');
+                        }}
+                      >
+                        <FileText className="h-3 w-3 mr-2" />
+                        Create New
+                      </Button>
+                    </div>
+                  ) : (
+                    marineDox
+                      .filter(doc => !attachedDocIds.includes(doc.id))
+                      .map((doc) => (
+                        <SelectItem key={doc.id} value={doc.id}>
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            {doc.title}
+                          </div>
+                        </SelectItem>
+                      ))
+                  )}
                 </SelectContent>
               </Select>
               {attachedDocIds.length > 0 && (

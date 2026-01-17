@@ -39,10 +39,17 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
         if (!channel) return "";
         if (channel.type !== 'dm') return channel.name;
 
-        // Find the other member
+        // Find the other member, or fallback to current user for self-chat
         const otherMemberId = channel.members.find(id => id !== user?.id);
-        const otherUser = chatUsers.find(u => u.id === otherMemberId);
-        return otherUser ? otherUser.name : "Unknown User";
+        const targetId = otherMemberId || user?.id; // If no other member found, it's self-chat
+
+        const targetUser = chatUsers.find(u => u.id === targetId);
+
+        if (targetUser && targetUser.id === user?.id) {
+            return "Note to Self";
+        }
+
+        return targetUser ? targetUser.name : "Unknown User";
     };
 
     const displayName = getChannelDisplayName();
@@ -121,7 +128,8 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
                     <>
                         {(() => {
                             const otherUserId = channel.members.find(id => id !== user?.id);
-                            const otherUser = chatUsers.find(u => u.id === otherUserId);
+                            const targetId = otherUserId || user?.id; // Fallback to self
+                            const otherUser = chatUsers.find(u => u.id === targetId);
                             if (otherUser) {
                                 const statusEmoji = otherUser.status.emoji || (
                                     otherUser.status.type === 'online' ? '🟢' :
@@ -140,9 +148,11 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
                                             <TooltipTrigger asChild>
                                                 <div className="relative mr-2 cursor-pointer">
                                                     <User className="h-5 w-5 text-muted-foreground" />
-                                                    <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background ${otherUser.status.type === 'online' ? 'bg-emerald-500' :
-                                                            otherUser.status.type === 'busy' || otherUser.status.type === 'meeting' || otherUser.status.type === 'dnd' ? 'bg-rose-500' :
-                                                                otherUser.status.type === 'lunch' ? 'bg-amber-500' : 'bg-slate-400'
+                                                    <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background ${otherUser.status.type === 'online' ? 'bg-green-500' :
+                                                        otherUser.status.type === 'busy' ? 'bg-red-500' :
+                                                            otherUser.status.type === 'meeting' ? 'bg-orange-500' :
+                                                                otherUser.status.type === 'dnd' ? 'bg-red-800' :
+                                                                    otherUser.status.type === 'lunch' ? 'bg-pink-500' : 'bg-gray-400'
                                                         }`} />
                                                 </div>
                                             </TooltipTrigger>

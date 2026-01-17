@@ -18,41 +18,41 @@ function Calendar({
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
-        months: "flex flex-col sm:flex-row gap-2",
-        month: "flex flex-col gap-4",
-        month_caption: "flex justify-center pt-1 relative items-center w-full",
-        caption_label: "text-sm font-medium",
+        months: "flex flex-col sm:flex-row gap-4 w-full",
+        month: "flex flex-col gap-4 w-full",
+        month_caption: "flex justify-center pt-1 relative items-center w-full mb-4",
+        caption_label: "text-lg md:text-xl font-semibold",
         nav: "flex items-center gap-1",
         button_previous: cn(
           buttonVariants({ variant: "outline" }),
-          "size-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1",
+          "size-8 md:size-9 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1 rounded-xl",
         ),
         button_next: cn(
           buttonVariants({ variant: "outline" }),
-          "size-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1",
+          "size-8 md:size-9 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1 rounded-xl",
         ),
-        month_grid: "w-full border-collapse space-x-1",
-        weekdays: "flex",
+        month_grid: "w-full border-collapse",
+        weekdays: "flex w-full",
         weekday:
-          "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
+          "text-muted-foreground rounded-md flex-1 font-medium text-sm md:text-base py-2 text-center",
         week: "flex w-full mt-2",
-        day: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
+        day: "relative text-center text-sm md:text-base focus-within:relative focus-within:z-20 flex-1 flex items-center justify-center p-1",
         day_button: cn(
-          buttonVariants({ variant: "ghost" }),
-          "size-8 p-0 font-normal aria-selected:opacity-100",
+          "inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+          "size-10 md:size-11 lg:size-12 p-0 rounded-xl hover:bg-orange-100 hover:text-orange-600 dark:hover:bg-orange-500/20 dark:hover:text-orange-400 focus:outline-none focus:ring-0 focus-visible:ring-0 border-0 outline-none cursor-pointer",
         ),
         range_start:
-          "day-range-start aria-selected:bg-primary aria-selected:text-primary-foreground rounded-l-md",
+          "rounded-l-xl rounded-r-none",
         range_end:
-          "day-range-end aria-selected:bg-primary aria-selected:text-primary-foreground rounded-r-md",
+          "rounded-r-xl rounded-l-none",
         selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-md",
-        today: "bg-accent text-accent-foreground rounded-md",
+          "!bg-orange-500 !text-white !opacity-100 hover:!bg-orange-600 hover:!text-white focus:!bg-orange-600 focus:!text-white !rounded-xl",
+        today: "!bg-orange-100 !text-orange-600 dark:!bg-orange-500/20 dark:!text-orange-400 !rounded-xl font-semibold",
         outside:
-          "day-outside text-muted-foreground aria-selected:text-muted-foreground",
+          "text-muted-foreground/40 !bg-transparent",
         disabled: "text-muted-foreground opacity-50",
         range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
+          "!bg-orange-100 dark:!bg-orange-500/20 !text-orange-600 !rounded-none",
         hidden: "invisible",
         ...classNames,
       }}

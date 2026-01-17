@@ -127,56 +127,68 @@ export default function ChatSidebar({ onNavigate }: { onNavigate?: () => void })
                         Direct Messages
                     </h3>
                     <div className="space-y-1">
-                        {chatUsers.map((chatUser) => {
-                            // Find existing DM channel to highlight active state if needed
-                            // For simplicity, we just list users to start/continue DM
-                            const activeDmChannel = dmChannels.find(ch => ch.members.includes(chatUser.id));
-                            const isActive = activeDmChannel && pathname === `/chat/${activeDmChannel.id}`;
+                        {chatUsers
+                            .sort((a, b) => {
+                                if (a.id === user?.id) return -1;
+                                if (b.id === user?.id) return 1;
+                                return 0;
+                            })
+                            .map((chatUser) => {
+                                // Find existing DM channel to highlight active state if needed
+                                // For simplicity, we just list users to start/continue DM
+                                const activeDmChannel = dmChannels.find(ch => ch.members.includes(chatUser.id));
+                                const isActive = activeDmChannel && pathname === `/chat/${activeDmChannel.id}`;
 
-                            const statusText = chatUser.status.text || chatUser.status.type.charAt(0).toUpperCase() + chatUser.status.type.slice(1);
-                            const statusEmoji = chatUser.status.emoji || '';
+                                const isCurrentUser = chatUser.id === user?.id;
+                                const statusText = chatUser.status.text || chatUser.status.type.charAt(0).toUpperCase() + chatUser.status.type.slice(1);
+                                const statusEmoji = chatUser.status.emoji || '';
 
-                            return (
-                                <Button
-                                    key={chatUser.id}
-                                    variant={isActive ? "secondary" : "ghost"}
-                                    className="w-full justify-start h-9 px-2 relative"
-                                    onClick={() => handleStartDM(chatUser.id)}
-                                >
-                                    <TooltipProvider delayDuration={0}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <div className="relative mr-2 cursor-pointer">
-                                                    <Avatar className="h-6 w-6">
-                                                        <AvatarImage src={chatUser.avatar} />
-                                                        <AvatarFallback className="text-[10px]">{chatUser.name.charAt(0)}</AvatarFallback>
-                                                    </Avatar>
-                                                    <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background transition-all duration-300 ${chatUser.status.type === 'online' ? 'bg-emerald-500' :
-                                                            chatUser.status.type === 'busy' || chatUser.status.type === 'meeting' || chatUser.status.type === 'dnd' ? 'bg-rose-500' :
-                                                                chatUser.status.type === 'lunch' ? 'bg-amber-500' : 'bg-slate-400'
-                                                        }`} />
-                                                </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent
-                                                side="top"
-                                                showArrow={false}
-                                                className="flex items-center gap-3 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-neutral-200 dark:border-neutral-800 rounded-2xl px-4 py-2.5 shadow-xl min-h-[40px] animate-in slide-in-from-bottom-2 duration-300"
-                                                sideOffset={16}
-                                            >
-                                                <span className="text-xl leading-none filter drop-shadow-sm">{statusEmoji}</span>
-                                                <div className="flex flex-col gap-0.5">
-                                                    <span className="text-sm font-semibold text-foreground leading-tight">{statusText}</span>
-                                                    <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/80">
-                                                        {chatUser.status.type}
-                                                    </span>
-                                                </div>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                    <span className="truncate">{chatUser.name}</span>
-                                </Button>
-                            );
-                        })}
+                                return (
+                                    <Button
+                                        key={chatUser.id}
+                                        variant={isActive ? "secondary" : "ghost"}
+                                        className="w-full justify-start h-9 px-2 relative"
+                                        onClick={() => handleStartDM(chatUser.id)}
+                                    >
+                                        <TooltipProvider delayDuration={0}>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <div className="relative mr-2 cursor-pointer">
+                                                        <Avatar className="h-6 w-6">
+                                                            <AvatarImage src={chatUser.avatar} />
+                                                            <AvatarFallback className="text-[10px]">{chatUser.name.charAt(0)}</AvatarFallback>
+                                                        </Avatar>
+                                                        <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background transition-all duration-300 ${chatUser.status.type === 'online' ? 'bg-green-500' :
+                                                            chatUser.status.type === 'busy' ? 'bg-red-500' :
+                                                                chatUser.status.type === 'meeting' ? 'bg-orange-500' :
+                                                                    chatUser.status.type === 'dnd' ? 'bg-red-800' :
+                                                                        chatUser.status.type === 'lunch' ? 'bg-pink-500' : 'bg-gray-400'
+                                                            }`} />
+                                                    </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent
+                                                    side="top"
+                                                    showArrow={false}
+                                                    className="flex items-center gap-3 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-neutral-200 dark:border-neutral-800 rounded-2xl px-4 py-2.5 shadow-xl min-h-[40px] animate-in slide-in-from-bottom-2 duration-300"
+                                                    sideOffset={16}
+                                                >
+                                                    <span className="text-xl leading-none filter drop-shadow-sm">{statusEmoji}</span>
+                                                    <div className="flex flex-col gap-0.5">
+                                                        <span className="text-sm font-semibold text-foreground leading-tight">{statusText}</span>
+                                                        <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/80">
+                                                            {chatUser.status.type}
+                                                        </span>
+                                                    </div>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                        <span className="truncate flex items-center gap-2">
+                                            {chatUser.name}
+                                            {isCurrentUser && <span className="text-xs text-muted-foreground/70 font-normal">(Note to self)</span>}
+                                        </span>
+                                    </Button>
+                                );
+                            })}
                     </div>
                 </div>
             </ScrollArea>

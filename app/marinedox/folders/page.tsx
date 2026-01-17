@@ -208,7 +208,7 @@ export default function FoldersPage() {
                                 placeholder="Search folders..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 rounded-xl"
+                                className="pl-10 rounded-xl border-0 ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-background/50"
                             />
                         </div>
                         <Select value={filterProject} onValueChange={setFilterProject}>

@@ -188,6 +188,7 @@ interface DataContextType {
     getChannels: (userId: string) => Channel[];
     startDirectMessage: (currentUserId: string, targetUserId: string) => string; // Returns channel ID
     updateUserStatus: (userId: string, status: UserStatus) => void;
+    syncCurrentUser: (user: { id: string, name: string, avatar?: string }) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -406,6 +407,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const [channels, setChannels] = useState<Channel[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [chatUsers, setChatUsers] = useState<ChatUser[]>([
+        { id: '1', name: 'You', avatar: 'https://images.unsplash.com/photo-1737574821698-862e77f044c1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBidXNpbmVzc21hbiUyMHBvcnRyYWl0fGVufDF8fHx8MTc2NzcxNjQ1NHww&ixlib=rb-4.1.0&q=80&w=400', status: { type: 'online' } },
         { id: 'user_2', name: 'Alice Johnson', avatar: '/avatars/alice.jpg', status: { type: 'online' } },
         { id: 'user_3', name: 'Bob Smith', status: { type: 'busy' } },
         { id: 'user_4', name: 'Charlie Brown', avatar: '/avatars/charlie.jpg', status: { type: 'meeting', emoji: '📅', text: 'In a meeting' } },
@@ -481,6 +483,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         if (savedMessages) {
             setMessages(JSON.parse(savedMessages));
+        }
+
+        // Load saved user status
+        const savedUserStatus = localStorage.getItem('marinefrost_user_status');
+        if (savedUserStatus) {
+            try {
+                const statusData = JSON.parse(savedUserStatus);
+                setChatUsers(prev => prev.map(u => {
+                    const savedStatus = statusData[u.id];
+                    return savedStatus ? { ...u, status: savedStatus } : u;
+                }));
+            } catch (e) {
+                console.error('Failed to load saved user status', e);
+            }
         }
     }, []);
 
@@ -849,7 +865,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
     };
 
     const updateUserStatus = (userId: string, status: UserStatus) => {
-        setChatUsers(prev => prev.map(u => u.id === userId ? { ...u, status } : u));
+        setChatUsers(prev => {
+            const updated = prev.map(u => u.id === userId ? { ...u, status } : u);
+            // Persist status to localStorage
+            const statusMap: Record<string, UserStatus> = {};
+            updated.forEach(u => { statusMap[u.id] = u.status; });
+            localStorage.setItem('marinefrost_user_status', JSON.stringify(statusMap));
+            return updated;
+        });
     };
 
     // Flatten all tasks from all projects for easy access
@@ -870,6 +893,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
             }))
         )
     );
+
+    const syncCurrentUser = (user: { id: string, name: string, avatar?: string }) => {
+        if (!chatUsers.some(u => u.id === user.id)) {
+            const newChatUser: ChatUser = {
+                id: user.id,
+                name: user.name,
+                avatar: user.avatar,
+                status: { type: 'online' }
+            };
+            setChatUsers(prev => [...prev, newChatUser]);
+        }
+    };
 
     return (
         <DataContext.Provider
@@ -915,7 +950,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
                 getMessages,
                 getChannels,
                 startDirectMessage,
-                updateUserStatus
+                updateUserStatus,
+                syncCurrentUser
             }}
         >
             {children}

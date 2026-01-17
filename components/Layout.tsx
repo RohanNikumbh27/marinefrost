@@ -4,6 +4,7 @@ import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from 'next-themes';
 import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
 import type { UserStatus } from '@/contexts/DataContext';
@@ -25,38 +26,28 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
     const { user, logout } = useAuth();
-    const { notifications, chatUsers, updateUserStatus } = useData();
+    const { notifications, chatUsers, updateUserStatus, syncCurrentUser } = useData();
     const router = useRouter();
     const pathname = usePathname();
     const [showNotifications, setShowNotifications] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    const { theme, setTheme, resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
     const [customStatusOpen, setCustomStatusOpen] = useState(false);
     const [customStatusText, setCustomStatusText] = useState('');
     const [customStatusEmoji, setCustomStatusEmoji] = useState('✏️');
 
+    // Prevent hydration mismatch by only rendering theme-dependent UI after mount
     useEffect(() => {
-        // This effect runs only once on mount to set the initial theme from localStorage or system preference
-        const storedTheme = localStorage.getItem('theme');
-        if (storedTheme === 'dark' || (storedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            setTheme('dark');
-            document.documentElement.classList.add('dark');
-        } else {
-            setTheme('light');
-            document.documentElement.classList.remove('dark');
-        }
+        setMounted(true);
     }, []);
 
     useEffect(() => {
-        // This effect runs whenever the theme state changes
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
+        if (user) {
+            // Ensure the logged-in user exists in the chat system
+            syncCurrentUser(user);
         }
-    }, [theme]);
+    }, [user, syncCurrentUser]);
 
     const currentUserStatus = chatUsers.find(u => u.id === user?.id)?.status || { type: 'online' };
 
@@ -106,16 +97,25 @@ export default function Layout({ children }: LayoutProps) {
                                 <span>Chat</span>
                             </div>
                         </Link>
+                        <Link
+                            href="/calendar"
+                            className={`text-sm transition-colors hover:text-orange-500 ${pathname?.startsWith('/calendar') ? 'text-orange-500' : 'text-muted-foreground'}`}
+                        >
+                            <div className="flex items-center space-x-2">
+                                <Calendar className="h-4 w-4" />
+                                <span>Calendar</span>
+                            </div>
+                        </Link>
                     </nav>
 
                     <div className="flex items-center gap-3 ml-auto">
                         <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
                             className="rounded-xl"
                         >
-                            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                            {mounted && (resolvedTheme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />)}
                         </Button>
 
                         <Sheet open={showNotifications} onOpenChange={setShowNotifications}>
@@ -159,12 +159,14 @@ export default function Layout({ children }: LayoutProps) {
                                     <DropdownMenuSubTrigger className="cursor-pointer rounded-xl py-2.5 px-3 transition-all duration-200">
                                         <div className="flex items-center gap-2 flex-1">
                                             <div className="relative">
-                                                <Circle className={`h-3 w-3 fill-current transition-colors ${currentUserStatus.type === 'online' ? 'text-emerald-500' :
-                                                    currentUserStatus.type === 'busy' || currentUserStatus.type === 'meeting' || currentUserStatus.type === 'dnd' ? 'text-rose-500' :
-                                                        currentUserStatus.type === 'lunch' ? 'text-amber-500' : 'text-slate-400'
+                                                <Circle className={`h-3 w-3 fill-current transition-colors ${currentUserStatus.type === 'online' ? 'text-green-500' :
+                                                    currentUserStatus.type === 'busy' ? 'text-red-500' :
+                                                        currentUserStatus.type === 'meeting' ? 'text-orange-500' :
+                                                            currentUserStatus.type === 'dnd' ? 'text-red-800' :
+                                                                currentUserStatus.type === 'lunch' ? 'text-pink-500' : 'text-gray-400'
                                                     }`} />
                                                 {currentUserStatus.type === 'online' && (
-                                                    <span className="absolute inset-0 h-3 w-3 rounded-full bg-emerald-500/20 animate-pulse" />
+                                                    <span className="absolute inset-0 h-3 w-3 rounded-full bg-green-500/20 animate-pulse" />
                                                 )}
                                             </div>
                                             <span className="font-medium text-sm">{currentUserStatus.emoji || ''} {currentUserStatus.text || currentUserStatus.type.charAt(0).toUpperCase() + currentUserStatus.type.slice(1)}</span>
@@ -176,60 +178,60 @@ export default function Layout({ children }: LayoutProps) {
                                             className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
                                         >
                                             <div className="flex items-center gap-2 flex-1">
-                                                <Circle className="h-3 w-3 fill-current text-emerald-500" />
+                                                <Circle className="h-3 w-3 fill-current text-green-500" />
                                                 <span className="font-medium text-sm">Online</span>
                                             </div>
-                                            {currentUserStatus.type === 'online' && <Check className="h-4 w-4 text-emerald-500" />}
+                                            {currentUserStatus.type === 'online' && <Check className="h-4 w-4 text-green-500" />}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => user && updateUserStatus(user.id, { type: 'meeting', emoji: '📅', text: 'In a meeting' })}
                                             className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
                                         >
                                             <div className="flex items-center gap-2 flex-1">
-                                                <Video className="h-4 w-4 text-rose-500" />
+                                                <Video className="h-4 w-4 text-orange-500" />
                                                 <span className="font-medium text-sm">In a meeting</span>
                                             </div>
-                                            {currentUserStatus.type === 'meeting' && <Check className="h-4 w-4 text-rose-500" />}
+                                            {currentUserStatus.type === 'meeting' && <Check className="h-4 w-4 text-orange-500" />}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => user && updateUserStatus(user.id, { type: 'busy', emoji: '🔴', text: 'Busy' })}
                                             className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
                                         >
                                             <div className="flex items-center gap-2 flex-1">
-                                                <Circle className="h-3 w-3 fill-current text-rose-500" />
+                                                <Circle className="h-3 w-3 fill-current text-red-500" />
                                                 <span className="font-medium text-sm">Busy</span>
                                             </div>
-                                            {currentUserStatus.type === 'busy' && <Check className="h-4 w-4 text-rose-500" />}
+                                            {currentUserStatus.type === 'busy' && <Check className="h-4 w-4 text-red-500" />}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => user && updateUserStatus(user.id, { type: 'dnd', emoji: '🚫', text: 'Do not disturb' })}
                                             className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
                                         >
                                             <div className="flex items-center gap-2 flex-1">
-                                                <Minus className="h-4 w-4 text-rose-500" />
+                                                <Minus className="h-4 w-4 text-red-800" />
                                                 <span className="font-medium text-sm">Do not disturb</span>
                                             </div>
-                                            {currentUserStatus.type === 'dnd' && <Check className="h-4 w-4 text-rose-500" />}
+                                            {currentUserStatus.type === 'dnd' && <Check className="h-4 w-4 text-red-800" />}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => user && updateUserStatus(user.id, { type: 'lunch', emoji: '🍽️', text: 'Out for lunch' })}
                                             className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
                                         >
                                             <div className="flex items-center gap-2 flex-1">
-                                                <Coffee className="h-4 w-4 text-amber-500" />
+                                                <Coffee className="h-4 w-4 text-pink-500" />
                                                 <span className="font-medium text-sm">Out for lunch</span>
                                             </div>
-                                            {currentUserStatus.type === 'lunch' && <Check className="h-4 w-4 text-amber-500" />}
+                                            {currentUserStatus.type === 'lunch' && <Check className="h-4 w-4 text-pink-500" />}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => user && updateUserStatus(user.id, { type: 'offline' })}
                                             className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
                                         >
                                             <div className="flex items-center gap-2 flex-1">
-                                                <Circle className="h-3 w-3 fill-current text-slate-400" />
+                                                <Circle className="h-3 w-3 fill-current text-gray-400" />
                                                 <span className="font-medium text-sm">Offline</span>
                                             </div>
-                                            {currentUserStatus.type === 'offline' && <Check className="h-4 w-4 text-slate-400" />}
+                                            {currentUserStatus.type === 'offline' && <Check className="h-4 w-4 text-gray-400" />}
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator className="my-1" />
                                         <DropdownMenuItem
@@ -362,6 +364,29 @@ export default function Layout({ children }: LayoutProps) {
                                                         <MessageSquare className="h-5 w-5" />
                                                     </div>
                                                     <span className="font-medium">Chat</span>
+                                                </Link>
+                                            </motion.div>
+
+                                            <motion.div
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ duration: 0.3, delay: 0.28 }}
+                                            >
+                                                <Link
+                                                    href="/calendar"
+                                                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${pathname?.startsWith('/calendar')
+                                                        ? 'bg-white/20 text-white shadow-lg'
+                                                        : 'text-white/80 hover:bg-white/10 hover:text-white'
+                                                        }`}
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                >
+                                                    <div className={`p-2 rounded-lg ${pathname?.startsWith('/calendar')
+                                                        ? 'bg-orange-500/30'
+                                                        : 'bg-white/10'
+                                                        }`}>
+                                                        <Calendar className="h-5 w-5" />
+                                                    </div>
+                                                    <span className="font-medium">Calendar</span>
                                                 </Link>
                                             </motion.div>
 

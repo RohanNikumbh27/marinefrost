@@ -84,7 +84,7 @@ export default function NotificationsPanel({ onClose }: NotificationsPanelProps)
             exit={{ opacity: 0, x: -100 }}
             transition={{ duration: 0.2 }}
             className={`
-                group relative p-5 rounded-2xl bg-card border border-border/50
+                group relative p-5 rounded-2xl bg-card
                 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer
                 ${!notification.read ? 'ring-1 ring-primary/20' : ''}
             `}
