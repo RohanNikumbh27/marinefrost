@@ -69,36 +69,62 @@ export default function ChatSidebar({ onNavigate }: { onNavigate?: () => void })
                                 <Plus className="h-5 w-5" />
                             </Button>
                         </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Create Channel</DialogTitle>
+                        <DialogContent className="bg-white/80 dark:bg-zinc-900/90 backdrop-blur-xl border-white/20 dark:border-white/10 shadow-2xl p-6 sm:rounded-3xl gap-0">
+                            <DialogHeader className="mb-6">
+                                <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Create Channel</DialogTitle>
                             </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="name">Name</Label>
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <Label htmlFor="name" className="text-xs font-bold text-muted-foreground ml-1 uppercase tracking-wider">Channel Name</Label>
                                     <Input
                                         id="name"
                                         value={newChannelName}
                                         onChange={(e) => setNewChannelName(e.target.value)}
                                         placeholder="e.g. project-updates"
+                                        className="bg-white/50 dark:bg-black/20 border-border/50 focus:border-blue-500/50 focus:ring-blue-500/20 rounded-xl h-11 px-4 transition-all"
                                     />
                                 </div>
-                                <div className="grid gap-2">
-                                    <Label>Type</Label>
-                                    <RadioGroup value={newChannelType} onValueChange={(v) => setNewChannelType(v as "public" | "private")}>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="public" id="public" />
-                                            <Label htmlFor="public">Public - joined by anyone</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="private" id="private" />
-                                            <Label htmlFor="private">Private - invitation only</Label>
-                                        </div>
+                                <div className="space-y-3">
+                                    <Label className="text-xs font-bold text-muted-foreground ml-1 uppercase tracking-wider">Privacy</Label>
+                                    <RadioGroup value={newChannelType} onValueChange={(v) => setNewChannelType(v as "public" | "private")} className="grid grid-cols-2 gap-4">
+                                        <label className={`cursor-pointer relative flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all hover:bg-muted/50 ${newChannelType === 'public' ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'border-transparent bg-muted/30'}`}>
+                                            <RadioGroupItem value="public" id="public" className="sr-only" />
+                                            <div className={`p-3 rounded-full ${newChannelType === 'public' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600' : 'bg-background text-muted-foreground'}`}>
+                                                <Hash className="h-6 w-6" />
+                                            </div>
+                                            <div className="text-center">
+                                                <div className={`font-semibold text-sm ${newChannelType === 'public' ? 'text-blue-700 dark:text-blue-300' : 'text-foreground'}`}>Public</div>
+                                                <div className="text-[10px] text-muted-foreground mt-0.5">Joined by anyone</div>
+                                            </div>
+                                            {newChannelType === 'public' && (
+                                                <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
+                                            )}
+                                        </label>
+
+                                        <label className={`cursor-pointer relative flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all hover:bg-muted/50 ${newChannelType === 'private' ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/10' : 'border-transparent bg-muted/30'}`}>
+                                            <RadioGroupItem value="private" id="private" className="sr-only" />
+                                            <div className={`p-3 rounded-full ${newChannelType === 'private' ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600' : 'bg-background text-muted-foreground'}`}>
+                                                <Lock className="h-6 w-6" />
+                                            </div>
+                                            <div className="text-center">
+                                                <div className={`font-semibold text-sm ${newChannelType === 'private' ? 'text-indigo-700 dark:text-indigo-300' : 'text-foreground'}`}>Private</div>
+                                                <div className="text-[10px] text-muted-foreground mt-0.5">Invitation only</div>
+                                            </div>
+                                            {newChannelType === 'private' && (
+                                                <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
+                                            )}
+                                        </label>
                                     </RadioGroup>
                                 </div>
                             </div>
-                            <DialogFooter>
-                                <Button onClick={handleCreateChannel}>Create Channel</Button>
+                            <DialogFooter className="mt-8">
+                                <Button
+                                    onClick={handleCreateChannel}
+                                    disabled={!newChannelName.trim()}
+                                    className="w-full h-11 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 transition-opacity text-white font-medium shadow-lg shadow-blue-500/20"
+                                >
+                                    Create Channel
+                                </Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>

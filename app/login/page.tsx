@@ -72,7 +72,7 @@ export default function LoginPage() {
                         className="flex items-center space-x-3"
                     >
                         <Logo className="h-12 w-12" />
-                        <span className="text-3xl font-bold">MarineFrost</span>
+                        <span className="text-4xl font-bold font-dancing tracking-wide">MarineFrost</span>
                     </motion.div>
 
                     <div className="space-y-8">
@@ -81,7 +81,7 @@ export default function LoginPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4, duration: 0.5 }}
                         >
-                            <h1 className="text-5xl font-bold mb-4 leading-tight">
+                            <h1 className="text-5xl font-bold font-dancing mb-4 leading-tight">
                                 Manage Projects<br />Like a Pro
                             </h1>
                             <p className="text-xl text-blue-100 leading-relaxed">
@@ -139,7 +139,7 @@ export default function LoginPage() {
                         className="lg:hidden flex flex-col items-center mb-8"
                     >
                         <Logo className="h-16 w-16 mb-4" />
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                        <h1 className="text-4xl font-bold font-dancing bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                             MarineFrost
                         </h1>
                     </motion.div>

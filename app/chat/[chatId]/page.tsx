@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Hash, Send, User, Paperclip, Image as ImageIcon, FileText, CheckSquare, X, Plus } from "lucide-react";
-import { useState, useEffect, useRef, use } from "react";
+import React, { useState, useEffect, useRef, use } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -193,10 +193,10 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
                                         <AvatarFallback className="text-3xl bg-muted">{displayName.charAt(0)}</AvatarFallback>
                                     </Avatar>
                                     <div className={`absolute bottom-1 right-1 h-6 w-6 rounded-full border-4 border-background ${targetUser.status.type === 'online' ? 'bg-green-500' :
-                                            targetUser.status.type === 'busy' ? 'bg-red-500' :
-                                                targetUser.status.type === 'meeting' ? 'bg-orange-500' :
-                                                    targetUser.status.type === 'dnd' ? 'bg-red-800' :
-                                                        targetUser.status.type === 'lunch' ? 'bg-pink-500' : 'bg-gray-400'
+                                        targetUser.status.type === 'busy' ? 'bg-red-500' :
+                                            targetUser.status.type === 'meeting' ? 'bg-orange-500' :
+                                                targetUser.status.type === 'dnd' ? 'bg-red-800' :
+                                                    targetUser.status.type === 'lunch' ? 'bg-pink-500' : 'bg-gray-400'
                                         }`} />
                                 </div>
                             ) : (

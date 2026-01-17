@@ -68,9 +68,7 @@ export default function Layout({ children }: LayoutProps) {
                         <div className="transition-transform group-hover:scale-110">
                             <Logo className="h-10 w-10" />
                         </div>
-                        <span className="hidden md:inline-block font-semibold text-xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                            MarineFrost
-                        </span>
+                        <span className="hidden md:inline-block font-bold font-dancing text-2xl bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">MarineFrost</span>
                     </Link>
 
                     <nav className="hidden md:flex items-center space-x-8 flex-1">
