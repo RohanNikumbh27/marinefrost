@@ -166,8 +166,15 @@ export default function TaskDialog({
   const renderStatusBadge = (status: Task['status']) => {
     const formatStatus = (s: string) => s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
+    const colors = {
+      'todo': 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+      'in-progress': 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
+      'review': 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
+      'done': 'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20'
+    };
+
     return (
-      <Badge variant="outline" className="rounded-xl px-2.5 py-0.5 border-foreground/10 bg-muted/50">
+      <Badge variant="outline" className={`rounded-xl px-2.5 py-0.5 border ${colors[status]}`}>
         {formatStatus(status)}
       </Badge>
     );
@@ -450,10 +457,30 @@ export default function TaskDialog({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="rounded-xl">
-                            <SelectItem value="todo">To Do</SelectItem>
-                            <SelectItem value="in-progress">In Progress</SelectItem>
-                            <SelectItem value="review">In Review</SelectItem>
-                            <SelectItem value="done">Done</SelectItem>
+                            <SelectItem value="todo">
+                              <div className="flex items-center gap-2">
+                                <div className="h-2 w-2 rounded-full bg-slate-400" />
+                                <span>To Do</span>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="in-progress">
+                              <div className="flex items-center gap-2">
+                                <div className="h-2 w-2 rounded-full bg-blue-500" />
+                                <span>In Progress</span>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="review">
+                              <div className="flex items-center gap-2">
+                                <div className="h-2 w-2 rounded-full bg-amber-500" />
+                                <span>Review</span>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="done">
+                              <div className="flex items-center gap-2">
+                                <div className="h-2 w-2 rounded-full bg-green-500" />
+                                <span>Done</span>
+                              </div>
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

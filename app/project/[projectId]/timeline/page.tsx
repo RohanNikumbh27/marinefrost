@@ -54,13 +54,13 @@ export default function TimelineView() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.back()}
               className="rounded-xl"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-3xl">Timeline View</h1>
+              <h1 className="text-3xl">Project Timeline</h1>
               <p className="text-muted-foreground">{project.name}</p>
             </div>
           </div>
@@ -71,10 +71,30 @@ export default function TimelineView() {
               </SelectTrigger>
               <SelectContent className="rounded-xl">
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="todo">To Do</SelectItem>
-                <SelectItem value="in-progress">In Progress</SelectItem>
-                <SelectItem value="review">Review</SelectItem>
-                <SelectItem value="done">Done</SelectItem>
+                <SelectItem value="todo">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-slate-400" />
+                    <span>To Do</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="in-progress">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-blue-500" />
+                    <span>In Progress</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="review">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-amber-500" />
+                    <span>Review</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="done">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500" />
+                    <span>Done</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
             <Select value={filterPriority} onValueChange={setFilterPriority}>
@@ -124,7 +144,14 @@ export default function TimelineView() {
                           >
                             {task.priority}
                           </Badge>
-                          <Badge className="rounded-full capitalize">
+                          <Badge
+                            variant="outline"
+                            className={`rounded-full capitalize border ${task.status === 'todo' ? 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20' :
+                                task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' :
+                                  task.status === 'review' ? 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' :
+                                    'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20'
+                              }`}
+                          >
                             {task.status.replace('-', ' ')}
                           </Badge>
                         </div>

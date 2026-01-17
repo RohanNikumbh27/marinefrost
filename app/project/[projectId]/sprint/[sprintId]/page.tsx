@@ -92,7 +92,7 @@ export default function SprintView() {
               onClick={() => router.push(`/project/${projectId}/timeline`)}
             >
               <Calendar className="h-4 w-4 mr-2" />
-              Timeline
+              Project Timeline
             </Button>
             <Button
               variant="outline"
