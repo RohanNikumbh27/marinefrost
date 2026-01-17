@@ -53,7 +53,7 @@ export default function CalendarView() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.back()}
             className="rounded-xl"
           >
             <ArrowLeft className="h-5 w-5" />

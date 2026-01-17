@@ -14,7 +14,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         <Layout>
             <div className="flex h-[calc(100vh-5rem)] md:h-[calc(100vh-8rem)] overflow-hidden -mx-6 -my-8 md:mx-0 md:my-0 md:rounded-2xl md:border md:bg-background md:shadow-sm">
                 {/* Desktop Sidebar - hidden on mobile */}
-                <div className="hidden md:block w-72 border-r">
+                <div className="hidden md:block w-72 border-r h-full">
                     <ChatSidebar />
                 </div>
 

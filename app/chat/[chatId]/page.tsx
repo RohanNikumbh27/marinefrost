@@ -34,25 +34,20 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
     const channel = channels.find(c => c.id === resolvedParams.chatId);
     const channelMessages = getMessages(resolvedParams.chatId);
 
-    // Helper to get DM display name
-    const getChannelDisplayName = () => {
+    // Helper to get target user for DMs
+    const targetUser = (() => {
+        if (!channel || channel.type !== 'dm' || !user) return undefined;
+        const otherMemberId = channel.members.find(id => id !== user.id);
+        const targetId = otherMemberId || user.id;
+        return chatUsers.find(u => u.id === targetId);
+    })();
+
+    const displayName = (() => {
         if (!channel) return "";
         if (channel.type !== 'dm') return channel.name;
-
-        // Find the other member, or fallback to current user for self-chat
-        const otherMemberId = channel.members.find(id => id !== user?.id);
-        const targetId = otherMemberId || user?.id; // If no other member found, it's self-chat
-
-        const targetUser = chatUsers.find(u => u.id === targetId);
-
-        if (targetUser && targetUser.id === user?.id) {
-            return "Note to Self";
-        }
-
+        if (targetUser && targetUser.id === user?.id) return "Note to Self";
         return targetUser ? targetUser.name : "Unknown User";
-    };
-
-    const displayName = getChannelDisplayName();
+    })();
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -190,15 +185,45 @@ export default function ChatDetailPage({ params }: { params: Promise<{ chatId: s
             <ScrollArea className="flex-1 min-h-0 p-2 md:p-4">
                 <div className="space-y-4">
                     {channelMessages.length === 0 ? (
-                        <div className="text-center py-10 text-muted-foreground text-sm">
-                            <div className="h-12 w-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
-                                {channel.type === 'dm' ? (
-                                    <User className="h-6 w-6 opacity-50" />
-                                ) : (
-                                    <Hash className="h-6 w-6 opacity-50" />
-                                )}
+                        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8 animate-in fade-in-50 duration-500">
+                            {channel.type === 'dm' && targetUser ? (
+                                <div className="relative mb-6">
+                                    <Avatar className="h-24 w-24 border-4 border-background shadow-xl">
+                                        <AvatarImage src={targetUser.avatar} />
+                                        <AvatarFallback className="text-3xl bg-muted">{displayName.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <div className={`absolute bottom-1 right-1 h-6 w-6 rounded-full border-4 border-background ${targetUser.status.type === 'online' ? 'bg-green-500' :
+                                            targetUser.status.type === 'busy' ? 'bg-red-500' :
+                                                targetUser.status.type === 'meeting' ? 'bg-orange-500' :
+                                                    targetUser.status.type === 'dnd' ? 'bg-red-800' :
+                                                        targetUser.status.type === 'lunch' ? 'bg-pink-500' : 'bg-gray-400'
+                                        }`} />
+                                </div>
+                            ) : (
+                                <div className="h-20 w-20 bg-muted/40 rounded-3xl flex items-center justify-center mb-6 shadow-sm">
+                                    <Hash className="h-10 w-10 text-muted-foreground/50" />
+                                </div>
+                            )}
+
+                            <div className="space-y-2 max-w-md">
+                                <h3 className="text-2xl font-bold tracking-tight">{displayName}</h3>
+                                <p className="text-muted-foreground">
+                                    {channel.type === 'dm'
+                                        ? `This is the beginning of your conversation with ${displayName}.`
+                                        : `Welcome to the beginning of the #${displayName} channel.`
+                                    }
+                                </p>
                             </div>
-                            <p>This is the start of your conversation with <span className="font-medium text-foreground">{displayName}</span>.</p>
+
+                            {channel.type === 'dm' && (
+                                <Button
+                                    className="mt-8 rounded-xl"
+                                    variant="outline"
+                                    onClick={() => fileInputRef.current?.click()} // Trigger something or just visual
+                                >
+                                    Say Hello 👋
+                                </Button>
+                            )}
                         </div>
                     ) : (
                         channelMessages.map((msg, index) => {

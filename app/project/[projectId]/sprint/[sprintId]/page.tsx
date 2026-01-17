@@ -11,15 +11,18 @@ import TaskDialog from '@/components/TaskDialog';
 import SprintSelector from '@/components/SprintSelector';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Calendar, Clock, Filter, Users2 } from 'lucide-react';
+import { Plus, Calendar, Clock, Filter, Users2, Settings } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import SprintActions from '@/components/SprintActions';
+import ProjectSettingsDialog from '@/components/ProjectSettingsDialog';
 
 export default function SprintView() {
   const { projectId, sprintId } = useParams() as { projectId: string; sprintId?: string };
   const { projects, updateTask } = useData();
   const router = useRouter();
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const project = projects.find(p => p.id === projectId);
@@ -83,43 +86,43 @@ export default function SprintView() {
                 <p className="text-sm text-muted-foreground truncate">{sprint.name}</p>
               </div>
             </div>
-            {/* Mobile Create Button removed from here */}
           </div>
 
-          {/* Action Buttons Row */}
-          <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 w-full">
             <SprintSelector projectId={projectId!} currentSprintId={sprintId!} />
-            <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
-              <Button
-                variant="outline"
-                className="rounded-xl"
-                size="sm"
-                onClick={() => router.push(`/project/${projectId}/timeline`)}
-              >
-                <Calendar className="h-4 w-4 mr-2" />
-                <span>Timeline</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="rounded-xl"
-                size="sm"
-                onClick={() => router.push(`/project/${projectId}/calendar`)}
-              >
-                <Clock className="h-4 w-4 mr-2" />
-                <span>Calendar</span>
-              </Button>
-              <Button
-                onClick={handleCreateTask}
-                className="col-span-2 rounded-xl md:hidden"
-                size="sm"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Create Task
-              </Button>
+            <div className="ml-auto">
+              <SprintActions projectId={projectId!} sprint={sprint} />
             </div>
           </div>
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              size="sm"
+              onClick={() => router.push(`/project/${projectId}/timeline`)}
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              <span>Timeline</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              size="sm"
+              onClick={() => router.push(`/project/${projectId}/calendar`)}
+            >
+              <Clock className="h-4 w-4 mr-2" />
+              <span>Calendar</span>
+            </Button>
+            <Button
+              onClick={handleCreateTask}
+              className="col-span-2 rounded-xl md:hidden"
+              size="sm"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Task
+            </Button>
+          </div>
         </div>
-
         {/* Sprint Info */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <div className="bg-card rounded-2xl p-4 border">
@@ -218,15 +221,15 @@ export default function SprintView() {
                           </Badge>
                         </td>
                         <td className="p-4">                          <Badge
-                            variant="outline"
-                            className={`rounded-full capitalize border ${task.status === 'todo' ? 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20' :
-                              task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' :
-                                task.status === 'review' ? 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' :
-                                  'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20'
-                              }`}
-                          >
-                            {task.status.replace('-', ' ')}
-                          </Badge>
+                          variant="outline"
+                          className={`rounded-full capitalize border ${task.status === 'todo' ? 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20' :
+                            task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' :
+                              task.status === 'review' ? 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' :
+                                'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20'
+                            }`}
+                        >
+                          {task.status.replace('-', ' ')}
+                        </Badge>
                         </td>
                         <td className="p-4">
                           <Badge
@@ -272,7 +275,13 @@ export default function SprintView() {
           projectKey={project.key}
           members={project.members}
         />
+
+        <ProjectSettingsDialog
+          open={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
+          project={project}
+        />
       </div>
-    </Layout>
+    </Layout >
   );
 }

@@ -11,13 +11,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Plus, FolderKanban, Calendar, Clock, Users } from 'lucide-react';
+import { Plus, FolderKanban, Calendar, Clock, Users, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'motion/react';
+import ProjectSettingsDialog from '@/components/ProjectSettingsDialog';
 
 export default function Dashboard() {
   const { projects, addProject } = useData();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  // New State for Settings
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
@@ -56,6 +62,12 @@ export default function Dashboard() {
     return { totalTasks, completedTasks };
   };
 
+  const openSettings = (e: React.MouseEvent, project: any) => {
+    e.stopPropagation(); // Prevent card click navigation
+    setSelectedProject(project);
+    setIsSettingsOpen(true);
+  };
+
   return (
     <Layout>
       <div className="space-y-8">
@@ -71,7 +83,7 @@ export default function Dashboard() {
                 <span className="hidden md:inline">New Project</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-2xl sm:max-w-[500px]">
+            <DialogContent className="rounded-2xl sm:max-w-[500px] pb-6">
               <DialogHeader>
                 <DialogTitle>Create New Project</DialogTitle>
                 <DialogDescription>
@@ -128,7 +140,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="rounded-xl">
+                <Button variant="ghost" onClick={() => setIsCreateDialogOpen(false)} className="rounded-xl">
                   Cancel
                 </Button>
                 <Button onClick={handleCreateProject} className="rounded-xl">
@@ -156,8 +168,9 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project, index) => {
-              const { totalTasks, completedTasks } = getProjectStats(project);
-              const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+              const stats = getProjectStats(project);
+              // Safely access current sprint - handle empty array or undefined
+              const activeSprint = project.sprints?.[0]; // Assuming first or active logic
 
               return (
                 <motion.div
@@ -165,15 +178,11 @@ export default function Dashboard() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -5 }}
+                  onClick={() => router.push(`/project/${project.id}/sprint/${activeSprint?.id || 'new'}`)}
+                  className="cursor-pointer group"
                 >
-                  <Card
-                    className="cursor-pointer hover:shadow-lg transition-all duration-300 rounded-2xl border-2 hover:border-blue-500 dark:hover:border-blue-600 h-full"
-                    onClick={() => {
-                      if (project.sprints.length > 0) {
-                        router.push(`/project/${project.id}/sprint/${project.sprints[0].id}`);
-                      }
-                    }}
-                  >
+                  <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 rounded-2xl border-2 hover:border-blue-500 dark:hover:border-blue-600 h-full group relative">
                     <CardHeader className="space-y-4">
                       <div className="flex items-start justify-between">
                         <div
@@ -182,9 +191,20 @@ export default function Dashboard() {
                         >
                           <span className="font-bold">{project.key}</span>
                         </div>
-                        <Badge className="rounded-full" variant="secondary">
-                          {project.sprints.length} {project.sprints.length === 1 ? 'Sprint' : 'Sprints'}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge className="rounded-full" variant="secondary">
+                            {project.sprints.length} {project.sprints.length === 1 ? 'Sprint' : 'Sprints'}
+                          </Badge>
+                          {/* SETTINGS ICON - Added safely here */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => openSettings(e, project)}
+                          >
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <CardTitle className="line-clamp-1">{project.name}</CardTitle>
@@ -195,19 +215,19 @@ export default function Dashboard() {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Progress</span>
-                          <span className="font-medium">{Math.round(progress)}%</span>
+                          <span className="font-medium">{Math.round(stats.totalTasks > 0 ? (stats.completedTasks / stats.totalTasks) * 100 : 0)}%</span>
                         </div>
                         <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
                           <div
                             className="h-full bg-blue-600 transition-all duration-300 rounded-full"
-                            style={{ width: `${progress}%` }}
+                            style={{ width: `${stats.totalTasks > 0 ? (stats.completedTasks / stats.totalTasks) * 100 : 0}%` }}
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div className="flex flex-col items-center space-y-1 text-center">
                           <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">{totalTasks} tasks</span>
+                          <span className="text-xs text-muted-foreground">{stats.totalTasks} tasks</span>
                         </div>
                         <div className="flex flex-col items-center space-y-1 text-center">
                           <Users className="h-4 w-4 text-muted-foreground" />
@@ -223,7 +243,7 @@ export default function Dashboard() {
                     </CardContent>
                     <CardFooter className="pt-0">
                       <div className="flex -space-x-2">
-                        {project.members.slice(0, 5).map((member) => (
+                        {project.members.slice(0, 5).map((member: any) => (
                           <div
                             key={member.id}
                             className="h-8 w-8 rounded-full border-2 border-background overflow-hidden"
@@ -246,6 +266,14 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {selectedProject && (
+        <ProjectSettingsDialog
+          open={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
+          project={selectedProject}
+        />
+      )}
     </Layout>
   );
 }
