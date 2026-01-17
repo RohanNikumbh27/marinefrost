@@ -71,7 +71,7 @@ export default function ChatSidebar({ onNavigate }: { onNavigate?: () => void })
                         </DialogTrigger>
                         <DialogContent className="bg-white/80 dark:bg-zinc-900/90 backdrop-blur-xl border-white/20 dark:border-white/10 shadow-2xl p-6 sm:rounded-3xl gap-0">
                             <DialogHeader className="mb-6">
-                                <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Create Channel</DialogTitle>
+                                <DialogTitle className="text-2xl font-bold text-foreground">Create Channel</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-6">
                                 <div className="space-y-2">
@@ -121,7 +121,7 @@ export default function ChatSidebar({ onNavigate }: { onNavigate?: () => void })
                                 <Button
                                     onClick={handleCreateChannel}
                                     disabled={!newChannelName.trim()}
-                                    className="w-full h-11 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 transition-opacity text-white font-medium shadow-lg shadow-blue-500/20"
+                                    className="w-full h-11 rounded-xl bg-black text-white hover:bg-black/90 transition-all font-medium shadow-lg"
                                 >
                                     Create Channel
                                 </Button>
