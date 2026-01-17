@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { LayoutDashboard, Moon, Sun, Bell, User, LogOut, Menu, FileText, X, MessageSquare, Home, FolderKanban, Calendar, Circle, Coffee, Video, Minus, Edit, Check, ChevronDown } from 'lucide-react';
+import { LayoutDashboard, Moon, Sun, Bell, User, LogOut, Menu, FileText, X, MessageSquare, Home, FolderKanban, Calendar, Circle, Coffee, Video, Minus, Edit, Check, ChevronDown, LayoutGrid, BookOpen, MessageCircle, CalendarDays } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import NotificationsPanel from '@/components/NotificationsPanel';
 import Logo from '@/components/Logo';
@@ -76,7 +76,7 @@ export default function Layout({ children }: LayoutProps) {
                     <nav className="hidden md:flex items-center space-x-8 flex-1">
                         <Link href="/dashboard" className={`text-sm transition-colors hover:text-primary ${pathname === '/dashboard' ? 'text-foreground' : 'text-muted-foreground'}`}>
                             <div className="flex items-center space-x-2">
-                                <LayoutDashboard className="h-4 w-4" />
+                                <LayoutGrid className="h-4 w-4" />
                                 <span>Projects</span>
                             </div>
                         </Link>
@@ -85,7 +85,7 @@ export default function Layout({ children }: LayoutProps) {
                             className={`text-sm transition-colors hover:text-[var(--marinedox-primary)] ${pathname?.startsWith('/marinedox') ? 'text-[var(--marinedox-primary)]' : 'text-muted-foreground'}`}
                         >
                             <div className="flex items-center space-x-2">
-                                <FileText className="h-4 w-4" />
+                                <BookOpen className="h-4 w-4" />
                                 <span>MarineDox</span>
                             </div>
                         </Link>
@@ -94,7 +94,7 @@ export default function Layout({ children }: LayoutProps) {
                             className={`text-sm transition-colors hover:text-blue-500 ${pathname?.startsWith('/chat') ? 'text-blue-500' : 'text-muted-foreground'}`}
                         >
                             <div className="flex items-center space-x-2">
-                                <MessageSquare className="h-4 w-4" />
+                                <MessageCircle className="h-4 w-4" />
                                 <span>Chat</span>
                             </div>
                         </Link>
@@ -103,7 +103,7 @@ export default function Layout({ children }: LayoutProps) {
                             className={`text-sm transition-colors hover:text-orange-500 ${pathname?.startsWith('/calendar') ? 'text-orange-500' : 'text-muted-foreground'}`}
                         >
                             <div className="flex items-center space-x-2">
-                                <Calendar className="h-4 w-4" />
+                                <CalendarDays className="h-4 w-4" />
                                 <span>Calendar</span>
                             </div>
                         </Link>
