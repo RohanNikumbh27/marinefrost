@@ -14,7 +14,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         <Layout>
             <div className="flex h-[calc(100vh-5rem)] md:h-[calc(100vh-8rem)] overflow-hidden -mx-6 -my-8 md:mx-0 md:my-0 md:rounded-2xl md:border md:bg-background md:shadow-sm">
                 {/* Desktop Sidebar - hidden on mobile */}
-                <div className="hidden md:block">
+                <div className="hidden md:block w-72 border-r">
                     <ChatSidebar />
                 </div>
 
@@ -28,7 +28,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                                     <Menu className="h-5 w-5" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="p-0 w-72">
+                            <SheetContent side="left" className="p-0 w-[300px] [&>button]:hidden">
                                 <ChatSidebar onNavigate={() => setIsMobileSidebarOpen(false)} />
                             </SheetContent>
                         </Sheet>

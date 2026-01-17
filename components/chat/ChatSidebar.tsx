@@ -49,13 +49,13 @@ export default function ChatSidebar({ onNavigate }: { onNavigate?: () => void })
     };
 
     return (
-        <div className="w-64 border-r h-full flex flex-col bg-background/50 backdrop-blur-md">
-            <div className="p-4 flex items-center justify-between">
-                <h2 className="font-semibold text-lg">MarineChat</h2>
+        <div className="w-full h-full flex flex-col bg-background/50 backdrop-blur-md">
+            <div className="p-4 flex items-center justify-between pl-6">
+                <h2 className="font-bold text-xl tracking-tight">MarineChat</h2>
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Plus className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-accent">
+                            <Plus className="h-5 w-5" />
                         </Button>
                     </DialogTrigger>
                     <DialogContent>

@@ -188,29 +188,29 @@ export default function TaskDetailPage() {
         <Layout>
             <div className="max-w-4xl mx-auto pb-6 space-y-6">
                 {/* Header Navigation */}
-                <div className="flex items-center justify-between">
-                    <Button variant="ghost" className="gap-2 pl-0 hover:bg-transparent" onClick={() => router.back()}>
+                <div className="flex items-center justify-between gap-2">
+                    <Button variant="ghost" className="gap-2 pl-0 hover:bg-transparent" size="sm" onClick={() => router.back()}>
                         <ArrowLeft className="h-4 w-4" />
-                        Back to Board
+                        <span className="hidden sm:inline">Back to Board</span>
                     </Button>
                     {!isEditing && (
-                        <Button variant="outline" size="sm" className="gap-2 rounded-xl" onClick={() => setIsEditing(true)}>
+                        <Button variant="outline" size="sm" className="gap-2 rounded-xl shrink-0" onClick={() => setIsEditing(true)}>
                             <Pencil className="h-3.5 w-3.5" />
-                            Edit Task
+                            <span className="hidden sm:inline">Edit Task</span>
                         </Button>
                     )}
                 </div>
 
-                <div className="bg-card border rounded-2xl p-6 md:p-8 shadow-sm">
+                <div className="bg-card border rounded-2xl p-4 sm:p-6 md:p-8 shadow-sm">
                     {!isEditing ? (
                         // View Mode
-                        <div className="space-y-8">
-                            <div className="border-b pb-6">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <span className="text-muted-foreground font-medium text-sm border px-2 py-0.5 rounded-md bg-muted/50">{projectKey}-{task.id}</span>
+                        <div className="space-y-6 md:space-y-8">
+                            <div className="border-b pb-4 md:pb-6">
+                                <div className="flex flex-wrap items-center gap-2 mb-3 md:mb-4">
+                                    <span className="text-muted-foreground font-medium text-xs sm:text-sm border px-2 py-0.5 rounded-md bg-muted/50">{projectKey}-{task.id}</span>
                                     {renderStatusBadge(task.status)}
                                 </div>
-                                <h1 className="text-3xl md:text-4xl font-bold leading-tight">{task.title}</h1>
+                                <h1 className="text-xl sm:text-2xl md:text-4xl font-bold leading-tight">{task.title}</h1>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

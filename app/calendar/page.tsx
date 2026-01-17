@@ -77,7 +77,7 @@ export default function GlobalCalendarPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Calendar */}
-                    <Card className="lg:col-span-2 p-6 lg:p-8 rounded-2xl">
+                    <Card className="lg:col-span-2 p-3 md:p-6 lg:p-8 rounded-2xl">
                         <Calendar
                             mode="single"
                             selected={selectedDate}
@@ -125,9 +125,9 @@ export default function GlobalCalendarPage() {
                                                 <Badge
                                                     variant="outline"
                                                     className={`text-xs rounded-full capitalize border ${task.status === 'todo' ? 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20' :
-                                                            task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' :
-                                                                task.status === 'review' ? 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' :
-                                                                    'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20'
+                                                        task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' :
+                                                            task.status === 'review' ? 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' :
+                                                                'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20'
                                                         }`}
                                                 >
                                                     {task.status.replace('-', ' ')}

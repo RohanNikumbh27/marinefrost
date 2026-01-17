@@ -59,16 +59,16 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="space-y-8">
-        <div className="flex justify-between items-start">
-          <div className="space-y-1">
-            <h1 className="text-3xl">Projects</h1>
-            <p className="text-muted-foreground">Manage your project portfolio</p>
+        <div className="flex justify-between items-start gap-4">
+          <div className="space-y-1 min-w-0">
+            <h1 className="text-2xl md:text-3xl font-semibold">Projects</h1>
+            <p className="text-muted-foreground text-sm md:text-base">Manage your project portfolio</p>
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="rounded-xl">
-                <Plus className="mr-2 h-4 w-4" />
-                New Project
+              <Button className="rounded-xl shrink-0" size="sm">
+                <Plus className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">New Project</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="rounded-2xl sm:max-w-[500px]">

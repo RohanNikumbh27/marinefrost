@@ -182,7 +182,7 @@ export default function TaskDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-2xl sm:max-w-[900px] max-h-[90vh] overflow-y-auto w-full">
+      <DialogContent className="rounded-none sm:rounded-2xl sm:max-w-[900px] max-h-[100dvh] sm:max-h-[90vh] overflow-y-auto w-full p-4 sm:p-6">
         <DialogHeader>
           <div className="flex items-center justify-between pr-6">
             <DialogTitle className="text-xl">

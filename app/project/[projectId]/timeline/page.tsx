@@ -48,25 +48,25 @@ export default function TimelineView() {
 
   return (
     <Layout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+      <div className="space-y-4 md:space-y-6">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center space-x-3">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => router.back()}
-              className="rounded-xl"
+              className="rounded-xl shrink-0"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div>
-              <h1 className="text-3xl">Project Timeline</h1>
-              <p className="text-muted-foreground">{project.name}</p>
+            <div className="min-w-0">
+              <h1 className="text-xl md:text-3xl font-semibold truncate">Project Timeline</h1>
+              <p className="text-muted-foreground text-sm truncate">{project.name}</p>
             </div>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-2">
             <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-[150px] rounded-xl">
+              <SelectTrigger className="w-full sm:w-[140px] rounded-xl">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -98,7 +98,7 @@ export default function TimelineView() {
               </SelectContent>
             </Select>
             <Select value={filterPriority} onValueChange={setFilterPriority}>
-              <SelectTrigger className="w-[150px] rounded-xl">
+              <SelectTrigger className="w-full sm:w-[140px] rounded-xl">
                 <SelectValue placeholder="Priority" />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
@@ -147,9 +147,9 @@ export default function TimelineView() {
                           <Badge
                             variant="outline"
                             className={`rounded-full capitalize border ${task.status === 'todo' ? 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20' :
-                                task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' :
-                                  task.status === 'review' ? 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' :
-                                    'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20'
+                              task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' :
+                                task.status === 'review' ? 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' :
+                                  'bg-green-100 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20'
                               }`}
                           >
                             {task.status.replace('-', ' ')}

@@ -36,10 +36,10 @@ function Calendar({
         weekday:
           "text-muted-foreground rounded-md flex-1 font-medium text-sm md:text-base py-2 text-center",
         week: "flex w-full mt-2",
-        day: "relative text-center text-sm md:text-base focus-within:relative focus-within:z-20 flex-1 flex items-center justify-center p-1",
+        day: "relative text-center text-sm md:text-base focus-within:relative focus-within:z-20 flex-1 flex items-center justify-center p-0 md:p-1",
         day_button: cn(
           "inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
-          "size-10 md:size-11 lg:size-12 p-0 rounded-xl hover:bg-orange-100 hover:text-orange-600 dark:hover:bg-orange-500/20 dark:hover:text-orange-400 focus:outline-none focus:ring-0 focus-visible:ring-0 border-0 outline-none cursor-pointer",
+          "h-8 w-8 md:h-10 md:w-10 lg:h-11 lg:w-11 p-0 rounded-xl hover:bg-orange-100 hover:text-orange-600 dark:hover:bg-orange-500/20 dark:hover:text-orange-400 focus:outline-none focus:ring-0 focus-visible:ring-0 border-0 outline-none cursor-pointer",
         ),
         range_start:
           "rounded-l-xl rounded-r-none",

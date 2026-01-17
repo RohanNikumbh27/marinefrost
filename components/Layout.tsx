@@ -16,7 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { LayoutDashboard, Moon, Sun, Bell, User, LogOut, Menu, FileText, X, MessageSquare, Home, FolderKanban, Calendar, Circle, Coffee, Video, Minus, Edit, Check } from 'lucide-react';
+import { LayoutDashboard, Moon, Sun, Bell, User, LogOut, Menu, FileText, X, MessageSquare, Home, FolderKanban, Calendar, Circle, Coffee, Video, Minus, Edit, Check, ChevronDown } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import NotificationsPanel from '@/components/NotificationsPanel';
 import Logo from '@/components/Logo';
 
@@ -154,97 +155,92 @@ export default function Layout({ children }: LayoutProps) {
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
 
-                                {/* Status Selector */}
-                                <DropdownMenuSub>
-                                    <DropdownMenuSubTrigger className="cursor-pointer rounded-xl py-2.5 px-3 transition-all duration-200">
-                                        <div className="flex items-center gap-2 flex-1">
-                                            <div className="relative">
-                                                <Circle className={`h-3 w-3 fill-current transition-colors ${currentUserStatus.type === 'online' ? 'text-green-500' :
-                                                    currentUserStatus.type === 'busy' ? 'text-red-500' :
-                                                        currentUserStatus.type === 'meeting' ? 'text-orange-500' :
-                                                            currentUserStatus.type === 'dnd' ? 'text-red-800' :
-                                                                currentUserStatus.type === 'lunch' ? 'text-pink-500' : 'text-gray-400'
-                                                    }`} />
-                                                {currentUserStatus.type === 'online' && (
-                                                    <span className="absolute inset-0 h-3 w-3 rounded-full bg-green-500/20 animate-pulse" />
-                                                )}
+                                {/* Status Selector - Opens Dialog */}
+                                <div className="px-1" onClick={(e) => e.stopPropagation()}>
+                                    <Select
+                                        value={currentUserStatus.type === 'custom' ? '' : currentUserStatus.type}
+                                        onValueChange={(value) => {
+                                            if (value === 'custom') {
+                                                setCustomStatusOpen(true);
+                                            } else if (user) {
+                                                // Map value to status object
+                                                const statusMap: Record<string, any> = {
+                                                    'online': { type: 'online' },
+                                                    'meeting': { type: 'meeting', emoji: '📅', text: 'In a meeting' },
+                                                    'busy': { type: 'busy', emoji: '🔴', text: 'Busy' },
+                                                    'dnd': { type: 'dnd', emoji: '🚫', text: 'Do not disturb' },
+                                                    'lunch': { type: 'lunch', emoji: '🍽️', text: 'Out for lunch' },
+                                                    'offline': { type: 'offline' }
+                                                };
+                                                updateUserStatus(user.id, statusMap[value]);
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-full border-0 shadow-none focus:ring-0 h-auto py-2.5 px-3 rounded-xl hover:bg-accent hover:text-accent-foreground data-[state=open]:bg-accent/50">
+                                            <div className="flex items-center gap-2 flex-1 text-left">
+                                                <div className="relative">
+                                                    <Circle className={`h-3 w-3 fill-current transition-colors ${currentUserStatus.type === 'online' ? 'text-green-500' :
+                                                        currentUserStatus.type === 'busy' ? 'text-red-500' :
+                                                            currentUserStatus.type === 'meeting' ? 'text-orange-500' :
+                                                                currentUserStatus.type === 'dnd' ? 'text-red-800' :
+                                                                    currentUserStatus.type === 'lunch' ? 'text-pink-500' : 'text-gray-400'
+                                                        }`} />
+                                                    {currentUserStatus.type === 'online' && (
+                                                        <span className="absolute inset-0 h-3 w-3 rounded-full bg-green-500/20 animate-pulse" />
+                                                    )}
+                                                </div>
+                                                <span className="font-medium text-sm text-foreground">
+                                                    {currentUserStatus.emoji || ''} {currentUserStatus.text || currentUserStatus.type.charAt(0).toUpperCase() + currentUserStatus.type.slice(1)}
+                                                </span>
                                             </div>
-                                            <span className="font-medium text-sm">{currentUserStatus.emoji || ''} {currentUserStatus.text || currentUserStatus.type.charAt(0).toUpperCase() + currentUserStatus.type.slice(1)}</span>
-                                        </div>
-                                    </DropdownMenuSubTrigger>
-                                    <DropdownMenuSubContent className="w-56 p-1">
-                                        <DropdownMenuItem
-                                            onClick={() => user && updateUserStatus(user.id, { type: 'online' })}
-                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
-                                        >
-                                            <div className="flex items-center gap-2 flex-1">
-                                                <Circle className="h-3 w-3 fill-current text-green-500" />
-                                                <span className="font-medium text-sm">Online</span>
-                                            </div>
-                                            {currentUserStatus.type === 'online' && <Check className="h-4 w-4 text-green-500" />}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => user && updateUserStatus(user.id, { type: 'meeting', emoji: '📅', text: 'In a meeting' })}
-                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
-                                        >
-                                            <div className="flex items-center gap-2 flex-1">
-                                                <Video className="h-4 w-4 text-orange-500" />
-                                                <span className="font-medium text-sm">In a meeting</span>
-                                            </div>
-                                            {currentUserStatus.type === 'meeting' && <Check className="h-4 w-4 text-orange-500" />}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => user && updateUserStatus(user.id, { type: 'busy', emoji: '🔴', text: 'Busy' })}
-                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
-                                        >
-                                            <div className="flex items-center gap-2 flex-1">
-                                                <Circle className="h-3 w-3 fill-current text-red-500" />
-                                                <span className="font-medium text-sm">Busy</span>
-                                            </div>
-                                            {currentUserStatus.type === 'busy' && <Check className="h-4 w-4 text-red-500" />}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => user && updateUserStatus(user.id, { type: 'dnd', emoji: '🚫', text: 'Do not disturb' })}
-                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
-                                        >
-                                            <div className="flex items-center gap-2 flex-1">
-                                                <Minus className="h-4 w-4 text-red-800" />
-                                                <span className="font-medium text-sm">Do not disturb</span>
-                                            </div>
-                                            {currentUserStatus.type === 'dnd' && <Check className="h-4 w-4 text-red-800" />}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => user && updateUserStatus(user.id, { type: 'lunch', emoji: '🍽️', text: 'Out for lunch' })}
-                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
-                                        >
-                                            <div className="flex items-center gap-2 flex-1">
-                                                <Coffee className="h-4 w-4 text-pink-500" />
-                                                <span className="font-medium text-sm">Out for lunch</span>
-                                            </div>
-                                            {currentUserStatus.type === 'lunch' && <Check className="h-4 w-4 text-pink-500" />}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => user && updateUserStatus(user.id, { type: 'offline' })}
-                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
-                                        >
-                                            <div className="flex items-center gap-2 flex-1">
-                                                <Circle className="h-3 w-3 fill-current text-gray-400" />
-                                                <span className="font-medium text-sm">Offline</span>
-                                            </div>
-                                            {currentUserStatus.type === 'offline' && <Check className="h-4 w-4 text-gray-400" />}
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator className="my-1" />
-                                        <DropdownMenuItem
-                                            onClick={() => setCustomStatusOpen(true)}
-                                            className="cursor-pointer rounded-lg py-2.5 px-3 transition-all duration-200 hover:scale-[1.02] focus:scale-[1.02]"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <Edit className="h-4 w-4" />
-                                                <span className="font-medium text-sm">Set custom status</span>
-                                            </div>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuSubContent>
-                                </DropdownMenuSub>
+                                        </SelectTrigger>
+                                        <SelectContent align="center" className="min-w-[200px] rounded-xl">
+                                            <SelectItem value="online">
+                                                <div className="flex items-center gap-2">
+                                                    <Circle className="h-3 w-3 fill-current text-green-500" />
+                                                    <span>Online</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="meeting">
+                                                <div className="flex items-center gap-2">
+                                                    <Video className="h-4 w-4 text-orange-500" />
+                                                    <span>In a meeting</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="busy">
+                                                <div className="flex items-center gap-2">
+                                                    <Circle className="h-3 w-3 fill-current text-red-500" />
+                                                    <span>Busy</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="dnd">
+                                                <div className="flex items-center gap-2">
+                                                    <Minus className="h-4 w-4 text-red-800" />
+                                                    <span>Do not disturb</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="lunch">
+                                                <div className="flex items-center gap-2">
+                                                    <Coffee className="h-4 w-4 text-pink-500" />
+                                                    <span>Out for lunch</span>
+                                                </div>
+                                            </SelectItem>
+                                            <SelectItem value="offline">
+                                                <div className="flex items-center gap-2">
+                                                    <Circle className="h-3 w-3 fill-current text-gray-400" />
+                                                    <span>Offline</span>
+                                                </div>
+                                            </SelectItem>
+                                            <div className="h-px bg-border my-1" />
+                                            <SelectItem value="custom">
+                                                <div className="flex items-center gap-2">
+                                                    <Edit className="h-4 w-4" />
+                                                    <span>Set custom status</span>
+                                                </div>
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
 
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer rounded-xl">
@@ -568,6 +564,7 @@ export default function Layout({ children }: LayoutProps) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
         </div>
     );
 }
