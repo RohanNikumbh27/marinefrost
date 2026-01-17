@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter, useParams } from 'next/navigation';
 import { useDrag } from 'react-dnd';
 import { Task } from '@/contexts/DataContext';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +28,10 @@ const priorityColors = {
 };
 
 export default function TaskCard({ task, onClick }: TaskCardProps) {
+  const router = useRouter();
+  const params = useParams();
+  const projectId = params?.projectId as string;
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'TASK',
     item: { id: task.id },
@@ -43,7 +48,7 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: isDragging ? 0.5 : 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      onClick={onClick}
+      onClick={() => router.push(`/project/${projectId}/task/${task.id}`)}
       className={`bg-card border rounded-xl p-3 cursor-pointer hover:shadow-md transition-all ${isDragging ? 'rotate-2 scale-105' : ''
         }`}
     >

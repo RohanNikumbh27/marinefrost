@@ -113,7 +113,7 @@ export default function GlobalCalendarPage() {
                                         <div
                                             key={`${task.projectId}-${task.id}`}
                                             className="p-3 bg-accent rounded-xl cursor-pointer hover:bg-accent/80 transition-colors"
-                                            onClick={() => router.push(`/project/${task.projectId}/sprint/${task.sprintId}`)}
+                                            onClick={() => router.push(`/project/${task.projectId}/task/${task.id}`)}
                                         >
                                             <div className="flex items-start justify-between mb-2">
                                                 <Badge
@@ -159,7 +159,7 @@ export default function GlobalCalendarPage() {
                                         <div
                                             key={`${task.projectId}-${task.id}`}
                                             className="flex items-center justify-between p-2 hover:bg-accent rounded-lg cursor-pointer transition-colors text-sm"
-                                            onClick={() => router.push(`/project/${task.projectId}/sprint/${task.sprintId}`)}
+                                            onClick={() => router.push(`/project/${task.projectId}/task/${task.id}`)}
                                         >
                                             <div className="flex-1 min-w-0">
                                                 <span className="truncate block">{task.title}</span>
