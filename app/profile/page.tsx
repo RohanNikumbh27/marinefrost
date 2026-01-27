@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Save, Trophy, Activity, GitBranch, Target, Mail, MapPin, Briefcase, Calendar, TrendingUp, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Save, Trophy, Activity, GitBranch, Target, Mail, MapPin, Briefcase, Calendar, TrendingUp, CheckCircle, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
 import { useData } from '@/contexts/DataContext';
@@ -77,7 +77,7 @@ export default function UserProfile() {
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                   <Avatar className="h-24 w-24">
                     <AvatarImage src={user?.avatar} alt={user?.name} />
-                    <AvatarFallback className="text-3xl">{user?.name?.charAt(0)}</AvatarFallback>
+                    <AvatarFallback className="text-3xl"><User className="h-12 w-12" /></AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-2">
                     <h2 className="text-2xl">{user?.name}</h2>

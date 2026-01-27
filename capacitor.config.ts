@@ -3,11 +3,10 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.marinefrost.app',
   appName: 'MarineFrost',
-  webDir: 'out', // Will be used when static export is available
+  webDir: 'out', // Dummy dir for CLI satisfaction
   server: {
-    // For development with live reload, uncomment the following and run `npm run dev` first:
-    // url: 'http://YOUR_LOCAL_IP:3000',
-    // cleartext: true, // Required for Android to allow HTTP
+    url: 'http://10.0.2.2:3000', // Android Emulator Localhost
+    cleartext: true,
     androidScheme: 'https',
   },
   plugins: {

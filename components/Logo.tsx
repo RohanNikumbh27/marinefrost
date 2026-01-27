@@ -9,8 +9,8 @@ export default function Logo({ className = "h-8 w-8" }: { className?: string }) 
             <defs>
                 <linearGradient id="marine-star-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#2563EB" /> {/* Blue 600 */}
-                    <stop offset="50%" stopColor="#0EA5E9" /> {/* Sky 500 */}
-                    <stop offset="100%" stopColor="#06B6D4" /> {/* Cyan 500 */}
+                    <stop offset="50%" stopColor="#0077ffff" /> {/* Sky 500 */}
+                    <stop offset="100%" stopColor="#0011ffff" /> {/* Cyan 500 */}
                 </linearGradient>
                 <filter id="star-glow" x="-20%" y="-20%" width="140%" height="140%">
                     <feGaussianBlur stdDeviation="3" result="blur" />

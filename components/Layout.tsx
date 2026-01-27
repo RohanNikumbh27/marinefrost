@@ -68,7 +68,7 @@ export default function Layout({ children }: LayoutProps) {
                         <div className="transition-transform group-hover:scale-110">
                             <Logo className="h-10 w-10" />
                         </div>
-                        <span className="hidden md:inline-block font-bold font-dancing text-2xl bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">MarineFrost</span>
+                        <span className="hidden md:inline-block font-bold font-dancing text-2xl bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">MarineFrost</span>
                     </Link>
 
                     <nav className="hidden md:flex items-center space-x-8 flex-1">
@@ -140,7 +140,7 @@ export default function Layout({ children }: LayoutProps) {
                                 <Button variant="ghost" className="rounded-full h-10 w-10 p-0">
                                     <Avatar className="h-10 w-10">
                                         <AvatarImage src={user?.avatar} alt={user?.name} />
-                                        <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                                        <AvatarFallback><User className="h-5 w-5" /></AvatarFallback>
                                     </Avatar>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -420,7 +420,7 @@ export default function Layout({ children }: LayoutProps) {
                                             <Avatar className="h-10 w-10 border-2 border-white/20">
                                                 <AvatarImage src={user?.avatar} alt={user?.name} />
                                                 <AvatarFallback className="bg-white/20 text-white">
-                                                    {user?.name?.charAt(0)}
+                                                    <User className="h-5 w-5" />
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div className="flex-1 min-w-0">

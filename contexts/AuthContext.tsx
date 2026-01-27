@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             id: '1',
             email,
             name: email.split('@')[0],
-            avatar: 'https://images.unsplash.com/photo-1737574821698-862e77f044c1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBidXNpbmVzc21hbiUyMHBvcnRyYWl0fGVufDF8fHx8MTc2NzcxNjQ1NHww&ixlib=rb-4.1.0&q=80&w=400',
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80',
             role: 'Product Manager',
             bio: 'Building amazing products'
         };
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             id: Date.now().toString(),
             email,
             name,
-            avatar: 'https://images.unsplash.com/photo-1524538198441-241ff79d153b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx5b3VuZyUyMHByb2Zlc3Npb25hbCUyMG1hbnxlbnwxfHx8fDE3Njc3Njc3NTF8MA&ixlib=rb-4.1.0&q=80&w=400',
+            avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80',
             role: 'Developer',
             bio: ''
         };
